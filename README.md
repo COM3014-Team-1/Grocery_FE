@@ -1,6 +1,16 @@
-<<<<<<< HEAD
 # Grocery FE
-=======
-# Grocery_FE
-Grocery website application frond end repository
->>>>>>> 4ac95f02b96c4ba983e59056a1e259e7f16720eb
+
+# Folder Structure
+src/
+│   ├── components/   # Reusable UI components
+│   ├── pages/        # Page-level components
+│   ├── store/        # Zustand store
+│   ├── hooks/        # Custom hooks (if needed)
+│   ├── styles/       # Global styles
+│   ├── tests/        # Unit and integration tests
+│   ├── App.js
+│   ├── index.js
+│   ├── routes.js     # Centralized routes config
+│── package.json
+│── README.md
+
