@@ -26,9 +26,9 @@ function App() {
       {/* <Header> add header component here */}
         <Routes>
           <Route path="/" element={<div>Home</div>} />
+          {/* <Route path="/products" products={products} /> */}
           <Route path="/product/:id" element={<ProductDetail />} />
         </Routes>
-      {/* <Header /> */}
       </BrowserRouter>
     </ThemeProvider>
   );
