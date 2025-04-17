@@ -7,7 +7,6 @@ const useCategoryStore = create((set) => ({
   fetchCategories: async () => {
     set({ isLoading: true });
     try {
-    //   const response = await axios.get("http://127.0.0.1:5000/categories");
     const response = await fetch("http://127.0.0.1:5001/categories");
     const data = await response.json();
       set({ categories: data });
