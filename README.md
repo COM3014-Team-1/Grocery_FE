@@ -14,3 +14,14 @@ src/
 │── package.json
 │── README.md
 
+
+# Run the project
+For the APIs to work:
+-Start the BFF project
+-Start the Product Service
+-Start the User Service
+
+
+Execute the following shell commands:
+-npm i
+-npm run start
