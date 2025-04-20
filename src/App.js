@@ -4,7 +4,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProductDetail from "./pages/product/ProductDetail";
-import CategoryPage from "./pages/Category/Category";
+import CategoryPage from "./pages/Category/CategoryPage";
 import Home from "./pages/Home/Home";
 import useCategoryStore from "./store/useCategoryStore";
 import Header from "./components/Header";
@@ -12,7 +12,7 @@ import { Box, CircularProgress } from "@mui/material";
 
 function App() {
   const { categories, fetchCategories, isLoading } = useCategoryStore();
-  
+
   const theme = createTheme({
     palette: {
       mode: "light",

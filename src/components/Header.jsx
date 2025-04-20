@@ -44,12 +44,6 @@ const Header = ({ categories }) => {
 
         {/* Right Side: Cart + User/Login/Signup */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <Button onClick={() => navigate('/')} variant="text" sx={{ color: 'white' }}>
-            Home
-          </Button>
-          <Button onClick={handleCategoryClick} variant="text" sx={{ color: 'white' }}>
-            Categories
-          </Button>
           <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
             {categories.map((cat) => (
               <MenuItem key={cat.category_id} onClick={() => handleCategorySelect(cat.category_id)}>

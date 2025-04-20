@@ -187,9 +187,9 @@ const CategoryPage = ({ id }) => {
   const category = filteredProducts.length > 0 ? filteredProducts[0].category_name : 'Category';
 
   return (
-    <Box display="flex" height="100vh" overflow="hidden" p={1} width="100%">
+    <Box display="flex" maxHeight="200vh" overflow="hidden" p={1} width="100%">
       <FilterPanel filters={filters} setFilters={setFilters} clearFilters={clearFilters} />
-      <Box flex={1} ml={2} display="flex" flexDirection="column" height="100vh">
+      <Box flex={1} ml={2} display="flex" flexDirection="column" maxHeight="200vh">
         <CategoryHeadingCard
           category_name={category}
           searchQuery={searchQuery}
@@ -204,7 +204,7 @@ const CategoryPage = ({ id }) => {
               <CircularProgress color="success" />
             </Box>
           ) : (
-            <Grid2 container spacing={2}>
+            <Grid2 container spacing={1}>
               {(searchQuery.length >= 3 ? searchResults : filteredProducts).map((product) => (
                 <Grid2 item key={product.product_id}>
                   <ProductCard product={product} />

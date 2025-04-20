@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardActionArea, CardMedia, CardContent, Container } from '@mui/material';
-import CategoryPage from '../Category/Category';
+import { Box, Typography, Card, Divider, CardActionArea, CardMedia, CardContent, Container } from '@mui/material';
+import CategoryPage from '../Category/CategoryPage';
 
 
 const Home = ({ categories }) => {
@@ -12,11 +12,11 @@ const Home = ({ categories }) => {
   return (
     <Box>
       {/* Top Banner Image */}
-      <Box>
+      <Box sx={{backgroundColor: '#084a1f'}}>
         <img
-          src="/Home_Page_1.png"
+          src="/Home_Page.png"
           alt="Banner"
-          style={{ width: '60%', maxHeight: '500px', objectFit: 'fill', marginLeft: 'auto', marginRight: 'auto', display: 'block' }}  
+          style={{ width: '40%', maxHeight: '500px', objectFit: 'fill', marginLeft: 'auto', marginRight: 'auto', display: 'block' }}  
         />
       </Box>
       <Box>
@@ -28,10 +28,14 @@ const Home = ({ categories }) => {
       </Box>
 
       {/* Shop By Category Heading */}
-      <Container sx={{ my: 4, marginRight: 0, marginLeft: 0 }} maxWidth='100%'>
-        <Typography variant="h4" fontWeight="bold" mb={2}>
+      <Container sx={{ my: 4}}>
+      <Box display="flex" alignItems="center" mb={3}>
+        <Divider sx={{ flexGrow: 1 }} />
+        <Typography variant="h5" fontWeight="bold" sx={{ mx: 2, whiteSpace: 'nowrap' }}>
           Shop By Category
         </Typography>
+        <Divider sx={{ flexGrow: 1 }} />
+      </Box>
 
         {/* Scrollable Category Row */}
         <Box
