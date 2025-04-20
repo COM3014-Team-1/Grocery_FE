@@ -3,7 +3,7 @@ import { create } from 'zustand';
 
 const useCategoryStore = create((set) => ({
   categories: [],
-  isLoading: false,
+  isLoading: true,
   fetchCategories: async () => {
     set({ isLoading: true });
     try {
@@ -19,3 +19,4 @@ const useCategoryStore = create((set) => ({
 }));
 
 export default useCategoryStore;
+
