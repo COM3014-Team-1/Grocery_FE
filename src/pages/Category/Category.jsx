@@ -112,8 +112,7 @@ const CategoryHeadingCard = ({ category_name, searchQuery, setSearchQuery }) => 
   </Card>
 );
 
-const CategoryPage = () => {
-  const { id } = useParams();
+const CategoryPage = ({ id }) => {
   const [products, setProducts] = useState([]);
   const [fetching, setFetching] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -132,6 +131,7 @@ const CategoryPage = () => {
 
   useEffect(() => {
     setFetching(true);
+    setProducts([]);
     fetch(`http://localhost:5001/products/by-category/${id}`)
       .then(res => res.json())
       .then(data => {
@@ -187,7 +187,7 @@ const CategoryPage = () => {
   const category = filteredProducts.length > 0 ? filteredProducts[0].category_name : 'Category';
 
   return (
-    <Box display="flex" height="100vh" overflow="hidden" p={2}>
+    <Box display="flex" height="100vh" overflow="hidden" p={1} width="100%">
       <FilterPanel filters={filters} setFilters={setFilters} clearFilters={clearFilters} />
       <Box flex={1} ml={2} display="flex" flexDirection="column" height="100vh">
         <CategoryHeadingCard

@@ -29,7 +29,7 @@ const Header = ({ categories }) => {
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: 'success.main', color: 'black', mb: 2 }}>
+    <AppBar position="sticky" sx={{ backgroundColor: 'success.main', color: 'black' }}>
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/* Left Side: Logo + Home + Categories */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
