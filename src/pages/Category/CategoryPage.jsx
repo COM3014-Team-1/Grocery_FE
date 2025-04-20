@@ -1,9 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, Typography, Card, Divider, CardContent, LinearProgress, Slider, Checkbox, FormControlLabel, FormGroup, FormLabel, Select, MenuItem, Button, Rating, Grid2, CircularProgress } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Card, Divider, Slider, Checkbox, FormControlLabel, FormGroup, FormLabel, Select, MenuItem, Button, Rating, Grid2, CircularProgress } from '@mui/material';
 import ProductCard from '../../components/ProductCard';
 import { TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';

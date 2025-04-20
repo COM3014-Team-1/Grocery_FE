@@ -8,7 +8,6 @@ import CategoryPage from "./pages/Category/CategoryPage";
 import Home from "./pages/Home/Home";
 import useCategoryStore from "./store/useCategoryStore";
 import Header from "./components/Header";
-import { Box, CircularProgress } from "@mui/material";
 
 function App() {
   const { categories, fetchCategories, isLoading } = useCategoryStore();

@@ -11,10 +11,6 @@ const Header = ({ categories }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
 
-  const handleCategoryClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
   const handleCategorySelect = (id) => {
     navigate(`/category/${id}`);
     setAnchorEl(null);
