@@ -1,10 +1,13 @@
 import React from 'react';
-import AuthForm from './AuthForm';  // import the AuthForm component
+import AuthForm from './AuthForm';  // Optional
+import Header from "./components/Header";
+//import OrderDetails from './orderdetails'; // Capitalize the component name
 
 function App() {
   return (
     <div className="App">
-      <AuthForm />  {/* Use the AuthForm component here */}
+      
+      <AuthForm />  {/* Capitalized when used as a JSX component */}
     </div>
   );
 }

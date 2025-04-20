@@ -1,0 +1,67 @@
+/* Styles for Order History Page */
+
+body {
+    margin: 0;
+    padding: 0;
+    background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=3174&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Add a semi-transparent overlay inside your container */
+.order-history-container {
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.8); /* <-- Transparent white background */
+    min-height: 100vh;
+    backdrop-filter: blur(4px); /* Optional: a slight blur effect */
+    border-radius: 12px;
+    margin: 2rem;
+}
+
+  
+  h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+  }
+  
+  .order-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 15px; /* This adds vertical spacing between rows */
+    background-color: rgba(255, 255, 255, 0.64);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .order-table th, 
+  .order-table td {
+    padding: 15px 20px; /* Add more inner space in each cell */
+    text-align: center;
+  }
+  
+  .order-table th {
+    background-color: #4e8750;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .order-table tr {
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+  
+  .order-table tr:hover {
+    background-color: #f1f1f1d5;
+    cursor: pointer;
+  }
+  
+  .order-table td {
+    font-size: 15px;
+    color: #555555;
+  }
+  

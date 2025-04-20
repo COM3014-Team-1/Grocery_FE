@@ -3,15 +3,24 @@ import "./LoginForm.css";
 
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
-  const [formData, setFormData] = useState({
-    username: "",
+
+  const init_form_data = {
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
-  });
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipcode: "",
+  };
+
+  const [formData, setFormData] = useState(init_form_data);
 
   const toggleAuthMode = () => {
     setIsSignUp((prev) => !prev);
+    setFormData(init_form_data);
   };
 
   const handleChange = (e) => {
@@ -22,14 +31,41 @@ const AuthForm = () => {
     e.preventDefault();
 
     if (isSignUp) {
-      // Basic client-side validation
-      if (formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match.");
-        return;
-      }
+      try {
+        if (formData.password !== formData.confirmPassword) {
+          alert("Passwords do not match.");
+          return;
+        }
+        const response = await fetch("http://127.0.0.1:5001/user/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+            address: formData.address,
+            city: formData.city,
+            state: formData.state,
+            zipcode: formData.zipcode,
+          }),
+        });
 
-      console.log("Sign Up data:", formData);
-      alert("Sign-up functionality not implemented yet.");
+        const data = await response.json();
+
+        if (response.ok && data.token) {
+          localStorage.setItem("token", data.token);
+          alert("Signup successful!");
+          window.location.href = "/dashboard"; // Redirect after signup
+        } else {
+          alert(data.message || "Signup failed");
+        }
+      } catch (err) {
+        console.error("Signup error:", err);
+        alert("Error during signup. Check console for details.");
+      }
     } else {
       try {
         const response = await fetch("http://127.0.0.1:5001/user/login", {
@@ -54,7 +90,7 @@ const AuthForm = () => {
         }
       } catch (err) {
         console.error("Login error:", err);
-        alert("Error logging in. Check console for details.");
+        alert("Error during login. Check console for details.");
       }
     }
   };
@@ -62,10 +98,10 @@ const AuthForm = () => {
   return (
     <div className={`container ${isSignUp ? "sign-up" : "sign-in"}`} id="authContainer">
       <div className="row">
-        {/* Left Side: Welcome / Join Us */}
+        {/* Left Side */}
         <div className="col align-items-center flex-col text-container">
           <div className={`text ${isSignUp ? "sign-up active" : "sign-in active"}`}>
-            <h2>{isSignUp ? "Join us here" : "Welcome back!"}</h2>
+            <h2>{isSignUp ? "Join us here" : "Welcome!"}</h2>
             <p>{isSignUp ? "Create an account to get started!" : "Sign in to continue."}</p>
           </div>
         </div>
@@ -79,9 +115,9 @@ const AuthForm = () => {
                   <i className="bx bxs-user"></i>
                   <input
                     type="text"
-                    name="username"
+                    name="name"
                     placeholder="Username"
-                    value={formData.username}
+                    value={formData.name}
                     onChange={handleChange}
                   />
                 </div>
@@ -114,6 +150,66 @@ const AuthForm = () => {
                     name="confirmPassword"
                     placeholder="Confirm Password"
                     value={formData.confirmPassword}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+              {isSignUp && (
+                <div className="input-group">
+                  <i className="bx bxs-phone"></i>
+                  <input
+                    type="text"
+                    name="phone"
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+              {isSignUp && (
+                <div className="input-group">
+                  <i className="bx bxs-home"></i>
+                  <input
+                    type="text"
+                    name="address"
+                    placeholder="Address"
+                    value={formData.address}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+              {isSignUp && (
+                <div className="input-group">
+                  <i className="bx bxs-city"></i>
+                  <input
+                    type="text"
+                    name="city"
+                    placeholder="City"
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+              {isSignUp && (
+                <div className="input-group">
+                  <i className="bx bxs-map"></i>
+                  <input
+                    type="text"
+                    name="state"
+                    placeholder="State"
+                    value={formData.state}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+              {isSignUp && (
+                <div className="input-group">
+                  <i className="bx bxs-map-pin"></i>
+                  <input
+                    type="text"
+                    name="zipcode"
+                    placeholder="Zipcode"
+                    value={formData.zipcode}
                     onChange={handleChange}
                   />
                 </div>
