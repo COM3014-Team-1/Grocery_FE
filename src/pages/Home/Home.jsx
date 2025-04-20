@@ -1,17 +1,94 @@
-import React, { useEffect } from 'react';
-import { Box, Typography, CircularProgress, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
-import useCategoryStore from '../../store/useCategoryStore';
+import React, { useEffect, useState } from 'react';
+import { Box, Typography, Card, CardActionArea, CardMedia, CardContent, Container } from '@mui/material';
+import CategoryPage from '../Category/Category';
 
-const Home = () => {
+
+const Home = ({ categories }) => {
+
+  // if(categories.length > 0) {
+    const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0].category_id);
+  
 
   return (
-    <Box p={4}>
-      <Typography variant="h4" gutterBottom>
-        Home Page
-      </Typography>
+    <Box>
+      {/* Top Banner Image */}
+      <Box>
+        <img
+          src="/Home_Page_1.png"
+          alt="Banner"
+          style={{ width: '70%', maxHeight: '500px', objectFit: 'fill', marginLeft: 'auto', marginRight: 'auto', display: 'block' }}  
+        />
+      </Box>
+      <Box>
+        <img
+          src="/Home_Page_2.png"
+          alt="Banner"
+          style={{ width: '70%', maxHeight: '500px', objectFit: 'fill', marginLeft: 'auto', marginRight: 'auto', display: 'block' }}
+        />
+      </Box>
+
+      {/* Shop By Category Heading */}
+      <Container sx={{ my: 4, marginRight: 0, marginLeft: 0 }} maxWidth='100%'>
+        <Typography variant="h4" fontWeight="bold" mb={2}>
+          Shop By Category
+        </Typography>
+
+        {/* Scrollable Category Row */}
+        <Box
+          display="flex"
+          overflow="auto"
+          gap={2}
+          pb={2}
+        >
+          {categories.map((category) => (
+            <Card
+              key={category.category_id}
+              sx={{
+                minWidth: 120,
+                minHeight: 120,
+                borderRadius: 2,
+                border: selectedCategoryId === category.category_id ? '2px solid green' : '1px solid #ccc',
+                flexShrink: 0,
+              }}
+            >
+              <CardActionArea onClick={() => setSelectedCategoryId(category.category_id)}>
+                <CardMedia
+                  component="img"
+                  height="80"
+                  image='/broccoli_opt.jpg'
+                  alt={category.name}
+                  sx={{ objectFit: 'contain', borderRadius: 1, backgroundColor: '#f5f5f5', }}
+                />
+                <CardContent sx={{ textAlign: 'center', p: 1 }}>
+                  <Typography variant="subtitle2">{category.name}</Typography>
+                </CardContent>
+              </CardActionArea>
+            </Card>
+          ))}
+        </Box>
+
+        {/* Category Page */}
+        <CategoryPage id={selectedCategoryId} />
+      </Container>
+
+      {/* Footer */}
+      <Footer />
     </Box>
   );
+// }
 };
+
+// Simple Footer Component
+const Footer = () => (
+  <Box
+    mt={4}
+    p={2}
+    bgcolor="success.main"
+    color="white"
+    textAlign="center"
+  >
+    <Typography variant="body2">© {new Date().getFullYear()} Grocify. All rights reserved.</Typography>
+  </Box>
+);
 
 export default Home;

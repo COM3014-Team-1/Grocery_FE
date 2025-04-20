@@ -8,29 +8,31 @@ import CategoryPage from "./pages/Category/Category";
 import Home from "./pages/Home/Home";
 import useCategoryStore from "./store/useCategoryStore";
 import Header from "./components/Header";
+import { Box, CircularProgress } from "@mui/material";
 
 function App() {
+  const { categories, fetchCategories, isLoading } = useCategoryStore();
+  
   const theme = createTheme({
     palette: {
       mode: "light",
     },
   });
 
-  const { categories, fetchCategories } = useCategoryStore();
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-      <Header categories={categories} />
+        <Header categories={categories} />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={isLoading ? (<div>Home</div>) : (<Home categories={categories}/>)} />
           <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/category/:id" element={<CategoryPage/>} />
+          <Route path="/category/:id" element={<CategoryPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
