@@ -1,6 +1,6 @@
 // store/categoryStore.js
 import { create } from 'zustand';
-import { getAuthToken } from '../util/auth';
+import { getAuthToken } from '../utils/auth';
 
 const useCategoryStore = create((set) => ({
   categories: [],
