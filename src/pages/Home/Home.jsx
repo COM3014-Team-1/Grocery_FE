@@ -16,7 +16,7 @@ const Home = ({ categories }) => {
         <img
           src="/Home_Page_1.png"
           alt="Banner"
-          style={{ width: '70%', maxHeight: '500px', objectFit: 'fill', marginLeft: 'auto', marginRight: 'auto', display: 'block' }}  
+          style={{ width: '60%', maxHeight: '500px', objectFit: 'fill', marginLeft: 'auto', marginRight: 'auto', display: 'block' }}  
         />
       </Box>
       <Box>
