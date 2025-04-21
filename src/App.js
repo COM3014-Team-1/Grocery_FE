@@ -10,6 +10,7 @@ import SignupForm from "./SignupForm";
 import Home from "./pages/Home/Home";
 import useCategoryStore from "./store/useCategoryStore";
 import Header from "./components/Header";
+import { Box, CircularProgress, Container } from "@mui/material";
 
 function App() {
   const { categories, fetchCategories, isLoading } = useCategoryStore();
@@ -33,7 +34,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<AuthForm />} />
           <Route path="/signup" element={<SignupForm />} />
-          <Route path="/" element={isLoading ? (<div>Home</div>) : (<Home categories={categories}/>)} />
+          <Route path="/" element={isLoading ? (<Container><CircularProgress color="success" /></Container>) : (<Home categories={categories}/>)} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
         </Routes>
