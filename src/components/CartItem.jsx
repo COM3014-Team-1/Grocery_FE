@@ -3,7 +3,7 @@ import { Box, Divider, IconButton, Typography, Grid2 } from '@mui/material';
 import { Add, Remove, Cancel, Close } from '@mui/icons-material';
 import { formatCurrency } from '../utils/currencyUtil';
 
-const CartItem = ({ item, onRemoveItem, onIncreaseQuantity, onDecreaseQuantity }) => {
+const CartItem = ({ item, onRemoveItem, onUpdateQuantity }) => {
   return (
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', padding: 2, width: '100%' }}>
@@ -51,7 +51,7 @@ const CartItem = ({ item, onRemoveItem, onIncreaseQuantity, onDecreaseQuantity }
                   borderRadius: 1,
                   marginRight: 1,
                 }}
-                onClick={() => onDecreaseQuantity(item.id)}
+                onClick={() => onUpdateQuantity(item.product_id, item.quantity - 1)}
                 disabled={item.quantity === 1}
               >
                 <Remove fontSize="small" />
@@ -66,7 +66,7 @@ const CartItem = ({ item, onRemoveItem, onIncreaseQuantity, onDecreaseQuantity }
                   borderRadius: 1,
                   marginLeft: 1,
                 }}
-                onClick={() => onIncreaseQuantity(item.id)}
+                onClick={() => onUpdateQuantity(item.product_id, item.quantity + 1)}
               >
                 <Add fontSize="small" />
               </IconButton>
@@ -74,7 +74,7 @@ const CartItem = ({ item, onRemoveItem, onIncreaseQuantity, onDecreaseQuantity }
           </Box>
 
           {/* Right Side: Close Button */}
-          <IconButton onClick={() => onRemoveItem(item.id)}>
+          <IconButton onClick={() => onRemoveItem(item.product_id)}>
             <Close />
           </IconButton>
         </Grid2>

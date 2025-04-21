@@ -39,10 +39,10 @@ export const useCartStore = create((set, get) => ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
         },
         credentials: "include",
-        body: JSON.stringify({ productId: product.id, quantity: 1 }),
+        body: JSON.stringify({ product_id: product.product_id, quantity: 1, user_id: uid, unit_price: product.price }),
       });
 
       await get().fetchCart();
@@ -70,9 +70,14 @@ export const useCartStore = create((set, get) => ({
 
   removeProductFromCart: async (productId) => {
     try {
-      await fetch(`/api/cart/${productId}`, {
+      await fetch(`${url}/remove`, {
         method: "DELETE",
         credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+        body: JSON.stringify({ products: [productId], user_id: uid }),
       });
 
       await get().fetchCart();
@@ -81,7 +86,7 @@ export const useCartStore = create((set, get) => ({
     }
   },
 
-  emptyCart: async () => {
+  emptyCart: async () => { //call when  order is placed
     try {
       const token = getAuthToken();
       await fetch("/api/cart", {
@@ -98,41 +103,22 @@ export const useCartStore = create((set, get) => ({
     }
   },
 
-  increaseQuantity: async (productId) => {
+  updateQuantity: async (productId, quantity) => {
     try {
       const token = getAuthToken();
-      await fetch(`${url}/add`, {
-        method: "POST",
+      await fetch(`${url}/update/${productId}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         credentials: "include",
-        body: JSON.stringify({ productId, quantity: 1 }),
+        body: JSON.stringify({ quantity }),
       });
 
       await get().fetchCart();
     } catch (err) {
       console.error("Failed to increase quantity:", err);
-    }
-  },
-
-  decreaseQuantity: async (productId) => {
-    try {
-      const token = getAuthToken();
-      await fetch(`${url}/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        credentials: "include",
-        body: JSON.stringify({ productId, quantity: -1 }),
-      });
-
-      await get().fetchCart();
-    } catch (err) {
-      console.error("Failed to decrease quantity:", err);
     }
   },
 }));

@@ -7,7 +7,7 @@ import { formatCurrency, getTotalPrice } from '../utils/currencyUtil';
 
 const CartDrawer = ({ open, onClose }) => {
   const [loading, setLoading] = useState(false);
-  const { fetchCart, cart, removeItem: removeProductFromCart, increaseQuantity, decreaseQuantity } = useCartStore();
+  const { fetchCart, cart, removeProductFromCart, updateQuantity } = useCartStore();
   
   useEffect(() => {
     if (open) {
@@ -61,12 +61,11 @@ const CartDrawer = ({ open, onClose }) => {
           <List>
             {cart.map((item) => (
               <>
-              <ListItem key={item.id} sx={{ padding: 0 }}>
+              <ListItem key={item.product_id} sx={{ padding: 0 }}>
                 <CartItem
                   item={item}
                   onRemoveItem={removeProductFromCart}
-                  onIncreaseQuantity={increaseQuantity}
-                  onDecreaseQuantity={decreaseQuantity}
+                  onUpdateQuantity={updateQuantity}
                 />
               </ListItem>
               <Divider sx={{ width: '100%' }}/>
