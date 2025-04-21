@@ -10,8 +10,10 @@ const useCategoryStore = create((set) => ({
     try {
     const token = getAuthToken();
     const response = await fetch("http://127.0.0.1:5001/categories", {
+      credentials: "include",
       headers: {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       }
     });
     const data = await response.json();

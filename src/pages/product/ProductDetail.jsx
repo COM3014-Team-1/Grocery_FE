@@ -15,6 +15,7 @@ import {
 import { useCartStore } from "../../store/useCartStore";
 import RelatedProducts from "./RelatedProducts";
 import { formatCurrency } from "../../utils/currencyUtil";
+import { getAuthToken } from "../../utils/auth";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -29,7 +30,14 @@ export default function ProductDetail() {
     async function fetchData() {
       setLoading(true);
       try {
-        const response = await fetch(url);
+        const token = getAuthToken();
+        const response = await fetch(url, {
+          credentials: "include",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
         const result = await response.json();
         const transformed = {
           product_id: result.produc_id,
@@ -47,7 +55,13 @@ export default function ProductDetail() {
   
         setData(transformed);
   
-        const resp = await fetch(`http://127.0.0.1:5001/products/by-category/${transformed.category_id}`);
+        const resp = await fetch(`http://127.0.0.1:5001/products/by-category/${transformed.category_id}`, {
+          credentials: "include",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
         const allProducts = await resp.json();
   
         const filtered = allProducts
