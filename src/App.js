@@ -31,8 +31,8 @@ function App() {
       <BrowserRouter>
         <Header categories={categories} />
         <Routes>
-	  <Route path="/login" element={<AuthForm />} />
-	  <Route path="/signup" element={<SignupForm />} />
+          <Route path="/login" element={<AuthForm />} />
+          <Route path="/signup" element={<SignupForm />} />
           <Route path="/" element={isLoading ? (<div>Home</div>) : (<Home categories={categories}/>)} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/category/:id" element={<CategoryPage />} />
