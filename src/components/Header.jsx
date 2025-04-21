@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
-import { AppBar, Toolbar, Button, Menu, MenuItem, IconButton, Box } from '@mui/material';
+import React, { use, useState, useEffect } from 'react';
+import { AppBar, Toolbar, Button, Menu, MenuItem, IconButton, Box, Badge } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useUserStore } from '../store/useUserStore';
 import CartDrawer from './CartDrawer';
+import { useCartStore } from '../store/useCartStore';
 
 const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useUserStore();
+  const { cart, fetchCart } = useCartStore()
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -19,6 +21,12 @@ const Header = () => {
   const handleUserMenuClose = () => {
     setUserMenuAnchorEl(null);
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchCart(); // Fetch cart when user is logged in
+    }
+  }, []);
 
   return (
     <AppBar position="sticky" sx={{ backgroundColor: 'success.main', color: 'black' }}>
@@ -35,9 +43,11 @@ const Header = () => {
 
         {/* Right Side: Cart + User/Login/Signup */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton onClick={() => setDrawerOpen(true)}>
+        <IconButton onClick={() => setDrawerOpen(true)}>
+          <Badge badgeContent={cart.length > 0 ? cart.length : 0} color="error">
             <ShoppingCartIcon sx={{ color: 'white' }} />
-          </IconButton>
+          </Badge>
+        </IconButton>
 
           {user ? (
             <>
