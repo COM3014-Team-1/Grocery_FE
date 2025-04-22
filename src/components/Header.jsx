@@ -90,3 +90,4 @@ const Header = ({ categories }) => {
 };
 
 export default Header;
+
