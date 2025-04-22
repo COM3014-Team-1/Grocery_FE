@@ -7,6 +7,7 @@ import {
   Container,
   Grid,
 } from '@mui/material';
+import { getAuthToken } from './utils/auth'; 
 
 const UserProfile = () => {
   const [user, setUser] = useState({
@@ -19,20 +20,32 @@ const UserProfile = () => {
     zipcode: '',
   });
 
-
-
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const user_id  = localStorage.getItem("user_id");
-        console.error("user_id",user_id);
+        const user_id = localStorage.getItem("user_id");
+        const token = getAuthToken(); //  Get the token here
+        if (!user_id || !token) {
+          console.warn("Missing user ID or token");
+          return;
+        }
+        else
+          {
+            console.warn("UserID token is called ");
+          }
+        
+
         const response = await fetch(`http://127.0.0.1:5001/user/user/${user_id}`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` // ✅ Attach the token here
           },
         });
+
+        if (!response.ok) {
+          throw new Error(`Error fetching user: ${response.status}`);
+        }
 
         const data = await response.json();
         setUser(data);
@@ -49,66 +62,31 @@ const UserProfile = () => {
       <Paper elevation={4} sx={{ p: 4, mt: 6, borderRadius: 3 }}>
         <Box textAlign="center" mb={4}>
           <Typography variant="h4" fontWeight="bold" gutterBottom>
-            { 'User Details'}
+            User Details
           </Typography>
         </Box>
 
         <Grid container spacing={5}>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Name"
-              value={user.username}
-              InputProps={{ readOnly: true }}
-            />
+            <TextField fullWidth label="Name" value={user.username} InputProps={{ readOnly: true }} />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Email"
-              value={user.email}
-              InputProps={{ readOnly: true }}
-            />
+            <TextField fullWidth label="Email" value={user.email} InputProps={{ readOnly: true }} />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Phone"
-              value={user.phone}
-              InputProps={{ readOnly: true }}
-            />
+            <TextField fullWidth label="Phone" value={user.phone} InputProps={{ readOnly: true }} />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Address"
-              value={user.address}
-              InputProps={{ readOnly: true }}
-            />
+            <TextField fullWidth label="Address" value={user.address} InputProps={{ readOnly: true }} />
           </Grid>
           <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="City"
-              value={user.city}
-              InputProps={{ readOnly: true }}
-            />
+            <TextField fullWidth label="City" value={user.city} InputProps={{ readOnly: true }} />
           </Grid>
           <Grid item xs={6}>
-            <TextField
-              fullWidth
-              label="State"
-              value={user.state}
-              InputProps={{ readOnly: true }}
-            />
+            <TextField fullWidth label="State" value={user.state} InputProps={{ readOnly: true }} />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="ZIP Code"
-              value={user.zipcode}
-              InputProps={{ readOnly: true }}
-            />
+            <TextField fullWidth label="ZIP Code" value={user.zipcode} InputProps={{ readOnly: true }} />
           </Grid>
         </Grid>
       </Paper>
