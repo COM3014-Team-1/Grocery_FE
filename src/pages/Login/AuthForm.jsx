@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, TextField, Button, Typography, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useUserStore } from '../../store/useUserStore';
 
 const AuthForm = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -17,6 +18,7 @@ const AuthForm = () => {
   });
 
   const navigate = useNavigate(); // useNavigate hook for programmatic navigation
+  const { user, setUser } = useUserStore();
 
   const toggleAuthMode = () => {
     setIsSignUp((prev) => !prev);
@@ -87,7 +89,8 @@ const AuthForm = () => {
         if (response.ok && data.token) {
           localStorage.setItem("token", data.token);
           localStorage.setItem("user_id",data.user.id);
-            alert("Login successful!");
+            setUser(data.user);
+            alert("Login successful!");           
           navigate("/"); // Use navigate for programmatic navigation
         } else {
           alert(data.message || "Login failed");
