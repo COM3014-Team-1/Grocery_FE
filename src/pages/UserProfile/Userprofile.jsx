@@ -39,7 +39,7 @@ const UserProfile = () => {
         const response = await fetch(`http://127.0.0.1:5001/user/user/${user_id}`, {
           method: 'GET',
           headers: {
-            Authorization: `${token}`, // ✅ correct format
+            Authorization: `${token}`, //  
             'Content-Type': 'application/json',
           },
         });
@@ -50,7 +50,7 @@ const UserProfile = () => {
 
         const data = await response.json();
         setUser(data);
-        setEditedUser(data); // ✅ keep edited data in sync
+        setEditedUser(data); //  keep edited data in sync
       } catch (error) {
         console.error('Error fetching the user data:', error);
       }
@@ -82,7 +82,7 @@ const UserProfile = () => {
         method: 'PUT',
         headers: {
           Authorization: `${token}`,
-          'Content-Type': 'application/json', // ✅ correct format
+          'Content-Type': 'application/json', // 
         },
         body: JSON.stringify({username,
           email,
