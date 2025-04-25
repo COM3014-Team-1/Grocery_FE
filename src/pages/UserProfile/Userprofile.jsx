@@ -7,7 +7,9 @@ import {
   Container,
   Grid,
   Button,
-  Stack
+  Stack,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { getAuthToken } from '../../utils/auth'; 
 
@@ -24,6 +26,11 @@ const UserProfile = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState(user);
+
+  // Snackbar state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // success or error
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -68,40 +75,50 @@ const UserProfile = () => {
       const user_id = localStorage.getItem("user_id");
       const token = getAuthToken();
       console.warn(JSON.stringify(editedUser));
-      // Destructure to exclude confirmPassword
-    const {
-      username,
-      email,
-      phone,
-      address,
-      city,
-      state,
-      zipcode,
-    } = editedUser;
+
+      const {
+        username,
+        email,
+        phone,
+        address,
+        city,
+        state,
+        zipcode,
+      } = editedUser;
+
       const response = await fetch(`http://127.0.0.1:5001/user/user/${user_id}/edit`, {
         method: 'PUT',
         headers: {
           Authorization: `${token}`,
-          'Content-Type': 'application/json', // 
+          'Content-Type': 'application/json', 
         },
-        body: JSON.stringify({username,
+        body: JSON.stringify({
+          username,
           email,
           phone,
           address,
           city,
           state,
-          zipcode}),
+          zipcode
+        }),
       });
 
       if (response.ok) {
         setUser(editedUser);
         setIsEditing(false);
-        alert("Profile updated successfully!");
+        setSnackbarMessage("Profile updated successfully!");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
       } else {
-        alert("Failed to update profile.");
+        setSnackbarMessage("Failed to update profile.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error("Update failed", error);
+      setSnackbarMessage("Error updating profile.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -158,6 +175,17 @@ const UserProfile = () => {
           )}
         </Stack>
       </Paper>
+
+      {/* Snackbar/Toast Notification */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000} // automatically close after 3 seconds
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

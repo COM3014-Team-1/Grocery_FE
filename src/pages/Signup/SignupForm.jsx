@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography, Container } from "@mui/material";
+import { Box, TextField, Button, Typography, Container, Snackbar, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
 const SignupForm = () => {
@@ -16,8 +16,13 @@ const SignupForm = () => {
     zipcode: "",
   });
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('error'); // 'error' or 'success'
+
   const navigate = useNavigate(); // useNavigate hook for programmatic navigation
 
+  // Function to toggle between SignUp and SignIn
   const toggleAuthMode = () => {
     setIsSignUp((prev) => !prev);
     setFormData({
@@ -37,85 +42,81 @@ const SignupForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const validatePassword = (password) => {
+    // Regex to validate password (min 8 characters, at least one uppercase, one lowercase, one digit, and one special character)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isSignUp) {
-      // Handle signup logic
-      if (formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match.");
+    // Check if all fields are filled
+    for (let key in formData) {
+      if (formData[key] === "") {
+        setSnackbarMessage("Please fill all fields.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
         return;
       }
-      // Destructure to exclude confirmPassword
-    const {
-      name,
-      email,
-      password,
-      phone,
-      address,
-      city,
-      state,
-      zipcode,
-    } = formData;
-      try {
-        const response = await fetch("http://127.0.0.1:5001/user/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-            phone,
-            address,
-            city,
-            state,
-            zipcode,
-          }),
-        });
+    }
 
-        const data = await response.json();
+    // Passwords should match
+    if (formData.password !== formData.confirmPassword) {
+      setSnackbarMessage("Passwords do not match.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
 
-        if (response.ok) {
-          alert("Signup successful! Please login now.");
-          window.location.href = "/login"; // redirect to login page after signup
-        } else {
-          console.error("Signup error:", data);
-          alert(data.message || "Signup failed123");
-        }
-  
-      } catch (err) {
-        console.error("Signup error:", err);
-        alert("Error during signup. Check console for details.");
+    // Validate password complexity
+    if (!validatePassword(formData.password)) {
+      setSnackbarMessage("Password must have at least one uppercase letter, one lowercase letter, one digit, and one special character.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
+
+    // Destructure to exclude confirmPassword
+    const { name, email, password, phone, address, city, state, zipcode } = formData;
+
+    try {
+      const response = await fetch("http://127.0.0.1:5001/user/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+          phone,
+          address,
+          city,
+          state,
+          zipcode,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSnackbarMessage("Signup successful! Please login now.");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+        setTimeout(() => {
+          navigate("/login"); // redirect to login page after signup
+        }, 2000);
+      } else {
+        setSnackbarMessage(data.message || "Signup failed.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
-    } else {
-      // Handle login logic
-      try {
-        const response = await fetch("http://127.0.0.1:5001/user/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.token) {
-          localStorage.setItem("token", data.token);
-          alert("Login successful!");
-          navigate("/"); // Use navigate for programmatic navigation
-        } else {
-          alert(data.message || "Login failed");
-        }
-      } catch (err) {
-        console.error("Login error:", err);
-        alert("Error during login. Check console for details.");
-      }
+    } catch (err) {
+      console.error("Signup error:", err);
+      setSnackbarMessage("Error during signup. Please try again.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
     }
   };
 
@@ -134,14 +135,8 @@ const SignupForm = () => {
     >
       {/* Text Section */}
       <Box sx={{ textAlign: "center", marginBottom: 3 }}>
-        <Typography variant="h4">
-          {isSignUp ? "Join us here" : "Welcome!"}
-        </Typography>
-        <Typography variant="body1">
-          {isSignUp
-            ? "Create an account to get started!"
-            : "Sign in to continue."}
-        </Typography>
+        <Typography variant="h4">{isSignUp ? "Join us here" : "Welcome!"}</Typography>
+        <Typography variant="body1">{isSignUp ? "Create an account to get started!" : "Sign in to continue."}</Typography>
       </Box>
 
       {/* Form */}
@@ -265,6 +260,17 @@ const SignupForm = () => {
           </Typography>
         </Box>
       </form>
+
+      {/* Snackbar/Toast Notification */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

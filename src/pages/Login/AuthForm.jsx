@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography, Container } from "@mui/material";
+import { Box, TextField, Button, Typography, Container, Snackbar, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { useUserStore } from '../../store/useUserStore';
 
@@ -16,6 +16,11 @@ const AuthForm = () => {
     state: "",
     zipcode: "",
   });
+
+  // Snackbar state
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // success or error
 
   const navigate = useNavigate(); // useNavigate hook for programmatic navigation
   const { user, setUser } = useUserStore();
@@ -45,7 +50,9 @@ const AuthForm = () => {
     if (isSignUp) {
       // Handle signup logic
       if (formData.password !== formData.confirmPassword) {
-        alert("Passwords do not match.");
+        setSnackbarMessage("Passwords do not match.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
         return;
       }
       try {
@@ -61,14 +68,20 @@ const AuthForm = () => {
 
         if (response.ok && data.token) {
           localStorage.setItem("token", data.token);
-          alert("Signup successful!");
+          setSnackbarMessage("Signup successful!");
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
           navigate("/dashboard"); // Use navigate for programmatic navigation
         } else {
-          alert(data.message || "Signup failed");
+          setSnackbarMessage(data.message || "Signup failed.");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
         }
       } catch (err) {
         console.error("Signup error:", err);
-        alert("Error during signup. Check console for details.");
+        setSnackbarMessage("Error during signup. Check console for details.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     } else {
       // Handle login logic
@@ -88,16 +101,24 @@ const AuthForm = () => {
 
         if (response.ok && data.token) {
           localStorage.setItem("token", data.token);
-          localStorage.setItem("user_id",data.user.id);
-            setUser(data.user);
-            alert("Login successful!");           
-          navigate("/"); // Use navigate for programmatic navigation
+          localStorage.setItem("user_id", data.user.id);
+          setUser(data.user);
+          setSnackbarMessage("Login successful!");
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
+          setTimeout(() => {
+            navigate("/"); // Use navigate for programmatic navigation
+          }, 2000);
         } else {
-          alert(data.message || "Login failed");
+          setSnackbarMessage(data.message || "Login failed.");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
         }
       } catch (err) {
         console.error("Login error:", err);
-        alert("Error during login. Check console for details.");
+        setSnackbarMessage("Error during login. Check console for details.");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
       }
     }
   };
@@ -117,13 +138,9 @@ const AuthForm = () => {
     >
       {/* Text Section */}
       <Box sx={{ textAlign: "center", marginBottom: 3 }}>
-        <Typography variant="h4">
-          {isSignUp ? "Join us here" : "Welcome!"}
-        </Typography>
+        <Typography variant="h4">{isSignUp ? "Join us here" : "Welcome!"}</Typography>
         <Typography variant="body1">
-          {isSignUp
-            ? "Create an account to get started!"
-            : "Sign in to continue."}
+          {isSignUp ? "Create an account to get started!" : "Sign in to continue."}
         </Typography>
       </Box>
 
@@ -248,6 +265,17 @@ const AuthForm = () => {
           </Typography>
         </Box>
       </form>
+
+      {/* Snackbar/Toast Notification */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000} // automatically close after 3 seconds
+        onClose={() => setSnackbarOpen(false)}
+      >
+        <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
