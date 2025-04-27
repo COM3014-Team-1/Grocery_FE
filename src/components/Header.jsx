@@ -29,7 +29,7 @@ const Header = () => {
   }, []);
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: 'success.main', color: 'black' }}>
+    <AppBar position="sticky" sx={{ backgroundColor: 'success.main', color: 'black' }} data-testid="header">
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Box

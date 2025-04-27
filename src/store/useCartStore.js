@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { useUserStore } from "./useUserStore";
 import { getAuthToken } from "../utils/auth"; // Adjust the import path as necessary
+import { orderResponseMapping } from "../utils/responseMapping";
 
 const url = 'http://127.0.0.1:5001/order/cart';
 const uid = useUserStore.getState().user.userId;
@@ -21,6 +22,7 @@ export const useCartStore = create((set, get) => ({
           Authorization: `Bearer ${token}`,
         },
       });
+      
       const data = await res.json();
 
       const totalItems = data.reduce((sum, item) => sum + item.quantity, 0);
@@ -28,6 +30,9 @@ export const useCartStore = create((set, get) => ({
 
       set({ cart: data, totalItems, totalPrice });
     } catch (err) {
+      set({ cart: [] });
+      set({ totalItems: 0 });
+      set({ totalPrice: 0 });
       console.error("Failed to fetch cart:", err);
     }
   },
@@ -50,23 +55,6 @@ export const useCartStore = create((set, get) => ({
       console.error("Failed to add to cart:", err);
     }
   },
-
-  // removeFromCart: async (product) => {
-  //   try {
-  //     await fetch("/api/cart", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       credentials: "include",
-  //       body: JSON.stringify({ productId: product.id, quantity: -1 }),
-  //     });
-
-  //     await get().fetchCart();
-  //   } catch (err) {
-  //     console.error("Failed to remove item from cart:", err);
-  //   }
-  // },
 
   removeProductFromCart: async (productId) => {
     try {
@@ -119,6 +107,27 @@ export const useCartStore = create((set, get) => ({
       await get().fetchCart();
     } catch (err) {
       console.error("Failed to increase quantity:", err);
+    }
+  },
+  
+  placeOrder: async (shippingAddress) => {
+    try {
+      const token = getAuthToken();
+      const orderData = orderResponseMapping(get().cart, shippingAddress);
+
+      await fetch("http://localhost:5001/order/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      await get().fetchCart();
+      // await get().emptyCart();
+    } catch (err) {
+      console.error("Failed to place order:", err);
     }
   },
 }));
