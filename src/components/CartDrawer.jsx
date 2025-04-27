@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Drawer, Box, IconButton, CircularProgress, Typography, List, ListItem, Divider, Button } from '@mui/material';
+import { Drawer, Box, IconButton, Skeleton, Typography, List, ListItem, Divider, Button } from '@mui/material';
 import { Close as CloseIcon, ShoppingBagOutlined } from '@mui/icons-material';
 import { useCartStore } from '../store/useCartStore';
 import CartItem from './CartItem';
 import { formatCurrency, getTotalPrice } from '../utils/currencyUtil';
+import { useNavigate } from 'react-router-dom';
 
 const CartDrawer = ({ open, onClose }) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { fetchCart, cart, removeProductFromCart, updateQuantity } = useCartStore();
   
@@ -50,9 +52,13 @@ const CartDrawer = ({ open, onClose }) => {
 
         {/* Loading Spinner */}
         {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 10 }}>
-            <CircularProgress color='success'/>
-          </Box>
+          <Box sx={{ mt: 4 }}>
+          {[1, 2].map((i) => (
+            <Box key={i} sx={{ mb: 2 }}>
+              <Skeleton variant="rectangular" height={80} animation="wave" sx={{ borderRadius: 2 }} />
+            </Box>
+          ))}
+        </Box>
         ) : cart.length === 0 ? (
           <Typography variant="h6" sx={{ textAlign: 'center', marginTop: 10 }}>
             Your cart is empty
@@ -60,16 +66,14 @@ const CartDrawer = ({ open, onClose }) => {
         ) : (
           <List>
             {cart.map((item) => (
-              <>
               <ListItem key={item.product_id} sx={{ padding: 0 }}>
                 <CartItem
                   item={item}
                   onRemoveItem={removeProductFromCart}
                   onUpdateQuantity={updateQuantity}
                 />
-              </ListItem>
               <Divider sx={{ width: '100%' }}/>
-              </>
+              </ListItem>
             ))}
           </List>
         )}
@@ -81,6 +85,11 @@ const CartDrawer = ({ open, onClose }) => {
           color="success"
           fullWidth
           sx={{ mb: 1 }}
+          onClick={() => {
+            onClose();
+            navigate('/cart'); // Navigate to the cart page
+          }}
+          disabled={cart.length === 0} // Disable if cart is empty
         >
           {`Checkout now (${formatCurrency(getTotalPrice(cart))})`}
         </Button>
