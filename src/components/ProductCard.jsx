@@ -5,10 +5,11 @@ import { formatCurrency } from '../utils/currencyUtil';
 import Rating from '@mui/material/Rating';
 
 const ProductCard = ({ product }) => {
+  const navigate = useNavigate();
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleClick = () => {
-    useNavigate(`/product/${product.product_id}`);
+    navigate(`/product/${product.product_id}`);
   };
 
   return (

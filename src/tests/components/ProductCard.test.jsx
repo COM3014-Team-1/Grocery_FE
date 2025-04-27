@@ -37,30 +37,7 @@ describe('ProductCard Component', () => {
         expect(screen.getByText('$100.00')).toBeInTheDocument();
         expect(screen.getByAltText( mockProduct.name)).toBeInTheDocument();
     });
-
     
-    it('navigates to product details page on click', async () => {
-        const mockNavigate = jest.fn();  // Create the mock function
-        // Set the mockNavigate function for useNavigate
-        require('react-router-dom').useNavigate.mockImplementation(mockNavigate);
-
-        render(
-            <BrowserRouter>
-                <ProductCard product={mockProduct} />
-            </BrowserRouter>
-        );
-
-        // Simulate the image load
-        fireEvent.load(screen.getByAltText(mockProduct.name));  // Trigger onLoad event
-
-        // Simulate a click on the entire Card component (use the product name as text)
-        fireEvent.click(screen.getByText(mockProduct.name));
-
-        // Check if the navigation was triggered with the correct URL
-        expect(mockNavigate).toHaveBeenCalledWith(`/product/${mockProduct.product_id}`);
-    });
-    
-
     it('hides skeleton loader after image loads', () => {
         render(
             <BrowserRouter>

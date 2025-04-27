@@ -95,6 +95,13 @@ describe('App Component', () => {
 
 describe('ProductDetail page', () => {
   beforeEach(() => {
+    useCategoryStore.mockReturnValue({
+      categories: [{
+        category_id: 1,
+      }],
+      fetchCategories: jest.fn(),
+      isLoading: false,
+    });
     // Mock MutationObserver
     global.MutationObserver = class {
       constructor(callback) {}

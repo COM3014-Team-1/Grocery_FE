@@ -1,4 +1,4 @@
-import React, { use, useState, useEffect } from 'react';
+import React, {useState, useEffect } from 'react';
 import { AppBar, Toolbar, Button, Menu, MenuItem, IconButton, Box, Badge } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';

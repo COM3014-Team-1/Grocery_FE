@@ -10,7 +10,7 @@ import SignupForm from "./SignupForm";
 import Home from "./pages/Home/Home";
 import useCategoryStore from "./store/useCategoryStore";
 import Header from "./components/Header";
-import { Snackbar, CircularProgress, Container } from "@mui/material";
+import { CircularProgress, Container } from "@mui/material";
 import CheckoutPage from "./pages/Checkout/CheckoutPage";
 import AlertNotification from "./components/Alert";
 

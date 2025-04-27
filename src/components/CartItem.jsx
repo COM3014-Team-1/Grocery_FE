@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Divider, IconButton, Typography, Grid2 } from '@mui/material';
-import { Add, Remove, Cancel, Close } from '@mui/icons-material';
+import { Box, IconButton, Typography, Grid2 } from '@mui/material';
+import { Add, Remove, Close } from '@mui/icons-material';
 import { formatCurrency } from '../utils/currencyUtil';
 
 const CartItem = ({ item, onRemoveItem, onUpdateQuantity }) => {
