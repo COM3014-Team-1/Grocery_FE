@@ -25,3 +25,11 @@ For the APIs to work:
 Execute the following shell commands:
 -npm i
 -npm run start
+
+# Run the tests
+npm run test
+
+-If you want to run a single test file, go to jest.config.js and replace this line
+export const testMatch = ['**/src/tests/**/*.test.js'];
+with
+export const testMatch = ['**/src/tests/**/*filename*.test.js'];
