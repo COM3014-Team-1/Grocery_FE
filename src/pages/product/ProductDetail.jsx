@@ -16,8 +16,7 @@ import { useCartStore } from "../../store/useCartStore";
 import RelatedProducts from "./RelatedProducts";
 import { formatCurrency } from "../../utils/currencyUtil";
 import { getAuthToken } from "../../utils/auth";
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
+import AlertNotification from "../../components/Alert";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -27,10 +26,6 @@ export default function ProductDetail() {
   const [error, setError] = useState(null);
   const [related, setRelated] = useState([]);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-
-  const handleSnackbarClose = () => {
-      setSnackbar({ ...snackbar, open: false });
-  };
 
   useEffect(() => {
     const url = `http://127.0.0.1:5001/products/${id}`;
@@ -162,7 +157,7 @@ export default function ProductDetail() {
                 if(existingItem) {
                   // If the item is already in the cart, increase its quantity
                   await updateQuantity(data.product_id, existingItem.quantity + 1);
-                  setSnackbar({ open: true, message: 'Item already in cart', severity: 'info' });
+                  setSnackbar({ open: true, message: 'Item added to cart successfully', severity: 'info' });
                   return;
                 }
                 await addToCart(data);
@@ -190,21 +185,8 @@ export default function ProductDetail() {
 
       <RelatedProducts relatedProducts={related} />
 
-      <Snackbar
-      open={snackbar.open}
-      autoHideDuration={3000}
-      onClose={handleSnackbarClose}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-    >
-      <Alert onClose={handleSnackbarClose} severity={snackbar.severity} sx={{ width: '100%' }}>
-        {snackbar.message}
-      </Alert>
-      </Snackbar>
+      <AlertNotification setSnackbarOpen={() => { setSnackbar({ open: false })}} snackbarMessage={snackbar.message} snackbarOpen={snackbar.open}/>
     </Container>
   );
 }
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
