@@ -3,13 +3,17 @@ import { useUserStore } from "./useUserStore";
 import { getAuthToken } from "../utils/auth";
 
 const url = 'http://127.0.0.1:5001/order/user';
-const uid = useUserStore.getState().user.userId;
 
 export const useOrderStore = create((set) => ({
   orders: [],
   fetchOrders: async () => {
     try {
       const token = getAuthToken();
+      const uid = useUserStore.getState().user.userId;
+      if (!uid) {
+        console.error("User ID is not available. Cannot fetch orders.");
+        return;
+      }
       const res = await fetch(`${url}/${uid}/orders`, {
         headers: {
           Authorization: `Bearer ${token}`,

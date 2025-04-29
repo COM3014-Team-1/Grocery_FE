@@ -12,7 +12,7 @@ import OrderDetailPage from "./pages/Order/OrderDetailPage";
 import LoginPage from "./pages/Login/AuthForm";
 import SignupPage from "./pages/Signup/SignupForm";
 import Header from "./components/Header";
-import { CircularProgress, Container, Container } from "@mui/material";
+import { CircularProgress, Container } from "@mui/material";
 import CheckoutPage from "./pages/Checkout/CheckoutPage";
 import AlertNotification from "./components/Alert";
 import ProfilePage from "./pages/UserProfile/Userprofile";
@@ -42,8 +42,8 @@ function App() {
         <BrowserRouter>
           <Header categories={categories} />
           <Routes>
-            <Route path="/login" element={<AuthForm />} />
-            <Route path="/signup" element={<SignupForm />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/signup" element={<SignupPage />} />
             <Route path="/" element={isLoading ? (<Container><CircularProgress color="success" /></Container>) : (<Home categories={categories}/>)} />
             <Route path="/product/:id" element={<ProductDetail />} />
             <Route path="/category/:id" element={<CategoryPage />} />
@@ -53,6 +53,8 @@ function App() {
             }}/>} />
             <Route path="/orders" element={<OrderHistoryPage />} />
           <Route path="/order/:orderId" element={<OrderDetailPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+            <Route path="*" element={<h1>404 Not Found</h1>} />
         </Routes>
         </BrowserRouter>
       </ThemeProvider>

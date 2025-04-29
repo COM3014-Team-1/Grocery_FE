@@ -4,7 +4,6 @@ import { getAuthToken } from "../utils/auth"; // Adjust the import path as neces
 import { orderResponseMapping } from "../utils/responseMapping";
 
 const url = 'http://127.0.0.1:5001/order/cart';
-const uid = useUserStore.getState().user.userId;
 
 export const useCartStore = create((set, get) => ({
   cart: [],
@@ -13,6 +12,11 @@ export const useCartStore = create((set, get) => ({
 
   fetchCart: async () => {
     try {
+      const uid = useUserStore.getState().user.userId;
+      if (!uid) {
+        console.error("User ID is not available. Cannot fetch cart.");
+        return;
+      }
       const token = getAuthToken();
       const res = await fetch(`${url}/${uid}`, 
       { 
@@ -40,6 +44,11 @@ export const useCartStore = create((set, get) => ({
   addToCart: async (product) => {
     try {
       const token = getAuthToken();
+      const uid = useUserStore.getState().user.userId;
+      if (!uid) {
+        console.error("User ID is not available. Cannot add to cart.");
+        return;
+      }
       await fetch(`${url}/add`, {
         method: "POST",
         headers: {
@@ -58,6 +67,12 @@ export const useCartStore = create((set, get) => ({
 
   removeProductFromCart: async (productId) => {
     try {
+      const token = getAuthToken();
+      const uid = useUserStore.getState().user.userId;
+      if (!uid) {
+        console.error("User ID is not available. Cannot remove from cart.");
+        return;
+      }
       await fetch(`${url}/remove`, {
         method: "DELETE",
         credentials: "include",
