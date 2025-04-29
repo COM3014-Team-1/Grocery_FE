@@ -9,6 +9,8 @@ import AuthForm from "./AuthForm";
 import SignupForm from "./SignupForm";  
 import Home from "./pages/Home/Home";
 import useCategoryStore from "./store/useCategoryStore";
+import OrderHistoryPage from "./pages/Order/OrderHistoryPage";
+import OrderDetailPage from "./pages/Order/OrderDetailPage";
 import Header from "./components/Header";
 import { CircularProgress, Container } from "@mui/material";
 import CheckoutPage from "./pages/Checkout/CheckoutPage";
@@ -48,7 +50,9 @@ function App() {
               setSnackbarMessage(msg);
               setSnackbarOpen(true);
             }}/>} />
-          </Routes>
+            <Route path="/orders" element={<OrderHistoryPage />} />
+          <Route path="/order/:orderId" element={<OrderDetailPage />} />
+        </Routes>
         </BrowserRouter>
       </ThemeProvider>
     </>
