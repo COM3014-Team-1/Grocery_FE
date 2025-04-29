@@ -5,17 +5,17 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProductDetail from "./pages/product/ProductDetail";
 import CategoryPage from "./pages/Category/CategoryPage";
-import AuthForm from "./pages/Login/AuthForm";  
-import SignupForm from "./pages/Signup/SignupForm";  
-import UserProfile from "./pages/UserProfile/Userprofile";
 import Home from "./pages/Home/Home";
 import useCategoryStore from "./store/useCategoryStore";
 import OrderHistoryPage from "./pages/Order/OrderHistoryPage";
 import OrderDetailPage from "./pages/Order/OrderDetailPage";
+import LoginPage from "./pages/Login/AuthForm";
+import SignupPage from "./pages/Signup/SignupForm";
 import Header from "./components/Header";
-import { CircularProgress, Container } from "@mui/material";
+import { CircularProgress, Container, Container } from "@mui/material";
 import CheckoutPage from "./pages/Checkout/CheckoutPage";
 import AlertNotification from "./components/Alert";
+import ProfilePage from "./pages/UserProfile/Userprofile";
 
 function App() {
   const { categories, fetchCategories, isLoading } = useCategoryStore();
