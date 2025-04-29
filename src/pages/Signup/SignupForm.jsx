@@ -1,278 +1,143 @@
-import React, { useState } from "react";
-import { Box, TextField, Button, Typography, Container, Snackbar, Alert } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import React, { useState } from 'react';
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Snackbar,
+  Alert,
+  Link,
+  Stack
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import LoyaltyIcon from '@mui/icons-material/Loyalty';
+import LocalMallIcon from '@mui/icons-material/LocalMall';
+import LoginIcon from '@mui/icons-material/Login';
+import CelebrationIcon from '@mui/icons-material/Celebration';
+import { Grid } from '@mui/material';
 
-const SignupForm = () => {
-  const [isSignUp, setIsSignUp] = useState(true);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipcode: "",
+const SignupPage = () => {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+    phone: '',
+    address: '',
+    city: '',
+    state: '',
+    zipcode: ''
   });
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('error'); // 'error' or 'success'
-
-  const navigate = useNavigate(); // useNavigate hook for programmatic navigation
-
-  // Function to toggle between SignUp and SignIn
-  const toggleAuthMode = () => {
-    setIsSignUp((prev) => !prev);
-    setFormData({
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      phone: "",
-      address: "",
-      city: "",
-      state: "",
-      zipcode: "",
-    });
-  };
+  const [error, setError] = useState('');
+  const [successOpen, setSuccessOpen] = useState(false);
+  const [errorOpen, setErrorOpen] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const validatePassword = (password) => {
-    // Regex to validate password (min 8 characters, at least one uppercase, one lowercase, one digit, and one special character)
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/;
-    return passwordRegex.test(password);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Check if all fields are filled
-    for (let key in formData) {
-      if (formData[key] === "") {
-        setSnackbarMessage("Please fill all fields.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
-        return;
-      }
-    }
-
-    // Passwords should match
-    if (formData.password !== formData.confirmPassword) {
-      setSnackbarMessage("Passwords do not match.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    // Validate password complexity
-    if (!validatePassword(formData.password)) {
-      setSnackbarMessage("Password must have at least one uppercase letter, one lowercase letter, one digit, and one special character.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
-      return;
-    }
-
-    // Destructure to exclude confirmPassword
-    const { name, email, password, phone, address, city, state, zipcode } = formData;
-
+  const handleSignup = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5001/user/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          phone,
-          address,
-          city,
-          state,
-          zipcode,
-        }),
+      const res = await fetch('http://localhost:5001/user/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
 
-      const data = await response.json();
+      const data = await res.json();
 
-      if (response.ok) {
-        setSnackbarMessage("Signup successful! Please login now.");
-        setSnackbarSeverity("success");
-        setSnackbarOpen(true);
-        setTimeout(() => {
-          navigate("/login"); // redirect to login page after signup
-        }, 2000);
+      if (res.ok) {
+        setSuccessOpen(true);
+        setTimeout(() => navigate('/login'), 1500);
       } else {
-        setSnackbarMessage(data.message || "Signup failed.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
+        setError(data.message || 'Signup failed');
+        setErrorOpen(true);
       }
     } catch (err) {
-      console.error("Signup error:", err);
-      setSnackbarMessage("Error during signup. Please try again.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+      setError('Something went wrong. Please try again.');
+      setErrorOpen(true);
     }
   };
 
   return (
-    <Container
-      component="main"
-      maxWidth="xs"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        padding: 2,
-        minHeight: "100vh", // Ensures the container is at least 100% of viewport height
-        overflow: "auto", // Ensures scrolling when content overflows
-      }}
-    >
-      {/* Text Section */}
-      <Box sx={{ textAlign: "center", marginBottom: 3 }}>
-        <Typography variant="h4">{isSignUp ? "Join us here" : "Welcome!"}</Typography>
-        <Typography variant="body1">{isSignUp ? "Create an account to get started!" : "Sign in to continue."}</Typography>
-      </Box>
+    <Container maxWidth="sm">
+      <Box display="flex" flexDirection="column" gap={3} mt={6}>
+        <Box textAlign="center">
+          <Typography variant="h4" color="success.main" fontWeight={700}>
+            Join Us Today! 🎉
+          </Typography>
+          <Typography variant="subtitle1" color="textSecondary" mt={1}>
+            Be part of our Grocify family and enjoy exclusive member benefits.
+          </Typography>
+          <Stack direction="row" spacing={2} justifyContent="center" mt={2}>
+            <Box display="flex" alignItems="center" gap={1}>
+              <LocalMallIcon color="primary" />
+              <Typography variant="body2">Track Your Orders</Typography>
+            </Box>
+            <Box display="flex" alignItems="center" gap={1}>
+              <LoyaltyIcon color="secondary" />
+              <Typography variant="body2">Member-Only Discounts</Typography>
+            </Box>
+          </Stack>
+        </Box>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        {isSignUp && (
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Username"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-        )}
+        <Box component="form" noValidate autoComplete="off" display="flex" flexDirection="column" gap={2}>
+            <TextField name="name" label="Full Name" required fullWidth onChange={handleChange} />
+            <TextField name="email" label="Email" type="email" required fullWidth onChange={handleChange} />
+            <TextField name="password" label="Password" type="password" required fullWidth onChange={handleChange} />
+            <TextField name="phone" label="Phone Number" required fullWidth onChange={handleChange} />
 
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Email"
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-
-        <TextField
-          fullWidth
-          margin="normal"
-          label="Password"
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-
-        {isSignUp && (
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Confirm Password"
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-        )}
-
-        {isSignUp && (
-          <>
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="City"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="State"
-              name="state"
-              value={formData.state}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Zipcode"
-              name="zipcode"
-              value={formData.zipcode}
-              onChange={handleChange}
-            />
-          </>
-        )}
+            <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                    <TextField name="address" label="Street Address" required fullWidth onChange={handleChange} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField name="city" label="City" required fullWidth onChange={handleChange} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField name="state" label="State" required fullWidth onChange={handleChange} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                    <TextField name="zipcode" label="Zip Code" required fullWidth onChange={handleChange} />
+                </Grid>
+            </Grid>
+        </Box>
 
         <Button
-          fullWidth
           variant="contained"
-          sx={{
-            marginTop: 2,
-            backgroundColor: "#128934",
-            color: "white",
-            fontSize: "1.1rem",
-            padding: "0.6rem 0",
-          }}
-          type="submit"
+          color="success"
+          size="large"
+          onClick={handleSignup}
+          startIcon={<CelebrationIcon />}
+          disabled={!form.name || !form.email || !form.password || !form.phone || !form.address || !form.city || !form.state || !form.zipcode}
         >
-          {isSignUp ? "Sign Up" : "Sign In"}
+          Join Now
         </Button>
 
-        <Box sx={{ textAlign: "center", marginTop: 2 }}>
-          <Typography variant="body2">
-            {isSignUp ? "Already have an account?" : "Don't have an account?"}
-            <b
-              onClick={toggleAuthMode}
-              style={{
-                cursor: "pointer",
-                color: "#128934",
-                fontWeight: "bold",
-              }}
-            >
-              {isSignUp ? " Sign in here" : " Sign up here"}
-            </b>
-          </Typography>
-        </Box>
-      </form>
+        <Typography variant="body2" textAlign="center" display="flex" alignItems="center" justifyContent="center" gap={1}>
+          <LoginIcon fontSize="small" />
+          Already a member?{" "}
+          <Link href="/login" color="primary" sx={{ ml: 0.5 }}>
+            Log in here
+          </Link>
+        </Typography>
+      </Box>
 
-      {/* Snackbar/Toast Notification */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-      >
-        <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)} sx={{ width: '100%' }}>
-          {snackbarMessage}
+      <Snackbar open={successOpen} autoHideDuration={3000} onClose={() => setSuccessOpen(false)}>
+        <Alert severity="success" sx={{ width: '100%' }}>
+          Signup successful! Redirecting to login...
+        </Alert>
+      </Snackbar>
+
+      <Snackbar open={errorOpen} autoHideDuration={4000} onClose={() => setErrorOpen(false)}>
+        <Alert severity="error" onClose={() => setErrorOpen(false)} sx={{ width: '100%' }}>
+          {error}
         </Alert>
       </Snackbar>
     </Container>
   );
 };
 
-export default SignupForm;
+export default SignupPage;

@@ -1,193 +1,156 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Container,
-  Grid,
-  Button,
-  Stack,
-  Snackbar,
-  Alert
+  Container, Box, TextField, Button, Typography,
+  Snackbar, Alert, Stack
 } from '@mui/material';
-import { getAuthToken } from '../../utils/auth'; 
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/CheckCircle';
+import CloseIcon from '@mui/icons-material/Close';
+import { useUserStore } from '../../store/useUserStore';
+import { getAuthToken } from '../../utils/auth';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const UserProfile = () => {
-  const [user, setUser] = useState({
-    username: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipcode: '',
-  });
+const ProfilePage = () => {
+  const { setUser } = useUserStore();
+  const { user } = useUserStore();                 // { name, userId }
+  const [form, setForm] = useState(null);          // editable copy
+  const [orig, setOrig] = useState(null);          // original copy
+  const [editMode, setEditMode] = useState(false);
+  const [snack, setSnack] = useState({ open:false, msg:'', sev:'success' });
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState(user);
-
-  // Snackbar state
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // success or error
-
+  // Fetch profile on mount
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const user_id = localStorage.getItem("user_id");
-        const token = getAuthToken();
-
-        if (!user_id || !token) {
-          console.warn("Missing user ID or token");
-          return;
-        }
-
-        const response = await fetch(`http://127.0.0.1:5001/user/user/${user_id}`, {
-          method: 'GET',
-          headers: {
-            Authorization: `${token}`, //  
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error fetching user: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setUser(data);
-        setEditedUser(data); //  keep edited data in sync
-      } catch (error) {
-        console.error('Error fetching the user data:', error);
-      }
+    const fetchProfile = async () => {
+      if (!user?.userId) return;
+      const res = await fetch(`http://localhost:5001/user/user/${user.userId}`, {
+        headers:{ Authorization:`Bearer ${getAuthToken()}` },
+        credentials:'include'
+      });
+      const data = await res.json();
+      setForm(data);
+      setOrig(data);     // keep pristine copy
     };
+    fetchProfile();
+  }, [user]);
 
-    fetchUser();
-  }, []);
-
-  const handleChange = (field, value) => {
-    setEditedUser(prev => ({ ...prev, [field]: value }));
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSave = async () => {
     try {
-      const user_id = localStorage.getItem("user_id");
-      const token = getAuthToken();
-      console.warn(JSON.stringify(editedUser));
+        const { created_at,user_id, ...payload } = form;   // created_at
 
-      const {
-        username,
-        email,
-        phone,
-        address,
-        city,
-        state,
-        zipcode,
-      } = editedUser;
-
-      const response = await fetch(`http://127.0.0.1:5001/user/user/${user_id}/edit`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `${token}`,
-          'Content-Type': 'application/json', 
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          phone,
-          address,
-          city,
-          state,
-          zipcode
-        }),
-      });
-
-      if (response.ok) {
-        setUser(editedUser);
-        setIsEditing(false);
-        setSnackbarMessage("Profile updated successfully!");
-        setSnackbarSeverity("success");
-        setSnackbarOpen(true);
-      } else {
-        setSnackbarMessage("Failed to update profile.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
+        const res = await fetch(
+            `http://localhost:5001/user/user/${user.userId}/edit`,
+            {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${getAuthToken()}`,
+              },
+              credentials: 'include',
+              body: JSON.stringify(payload),   // now has no created_at or email
+            }
+          );
+          if (res.ok) {
+            // 1. update local pristine copy
+            setOrig(form);
+            setEditMode(false);
+          
+            // 2. update global user (header will refresh)
+            setUser({
+              ...user,
+              name: payload.username,   // new name
+            });
+          
+            setSnack({ open: true, msg: 'Profile updated!', sev: 'success' });
+          } else {
+        const { message } = await res.json();
+        throw new Error(message || 'Update failed');
       }
-    } catch (error) {
-      console.error("Update failed", error);
-      setSnackbarMessage("Error updating profile.");
-      setSnackbarSeverity("error");
-      setSnackbarOpen(true);
+    } catch (err) {
+      setSnack({ open:true, msg:err.message, sev:'error' });
     }
   };
 
-  const handleCancel = () => {
-    setEditedUser(user);
-    setIsEditing(false);
+
+  const handleDiscard = () => {
+    setForm(orig);
+    setEditMode(false);
   };
 
+  if (!form) return null; // or a loader
+
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={4} sx={{ p: 4, mt: 6, borderRadius: 3 }}>
-        <Box textAlign="center" mb={4}>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            User Details
-          </Typography>
-        </Box>
+    <Container maxWidth="lg" sx={{ px: { xs: 2, sm: 3 }, py: 3 }}>
+      {/* Title bar (icon + text) */}
+      <Box display="flex" alignItems="center" gap={1} mb={3}>
+        <AccountCircleIcon color="success" />
+        <Typography variant="h5" fontWeight={600}>My Profile</Typography>
+      </Box>
 
-        <Grid container spacing={3}>
-          {[
-            { label: "Name", key: "username" },
-            { label: "Email", key: "email" },
-            { label: "Phone", key: "phone" },
-            { label: "Address", key: "address" },
-            { label: "City", key: "city" },
-            { label: "State", key: "state" },
-            { label: "ZIP Code", key: "zipcode" },
-          ].map(({ label, key }) => (
-            <Grid item xs={key === "city" || key === "state" ? 6 : 12} key={key}>
-              <TextField
-                fullWidth
-                label={label}
-                value={editedUser[key] || ''}
-                onChange={(e) => handleChange(key, e.target.value)}
-                InputProps={{ readOnly: !isEditing }}
-              />
-            </Grid>
-          ))}
-        </Grid>
+      <Stack spacing={2}>
+        {/* Basic fields */}
+        <TextField name="username" label="Name" value={form.username || ''} onChange={handleChange} disabled={!editMode}/>
+        <TextField name="email" label="Email" value={form.email || ''} onChange={handleChange} disabled/>
+        <TextField name="phone" label="Phone" value={form.phone || ''} onChange={handleChange} disabled={!editMode}/>
+        <TextField name="address" label="Address" value={form.address || ''} onChange={handleChange} disabled={!editMode}/>
+        <TextField name="city" label="City" value={form.city || ''} onChange={handleChange} disabled={!editMode}/>
+        <TextField name="state" label="State" value={form.state || ''} onChange={handleChange} disabled={!editMode}/>
+        <TextField name="zipcode" label="Zip Code" value={form.zipcode || ''} onChange={handleChange} disabled={!editMode}/>
+      </Stack>
 
-        <Stack direction="row" spacing={2} mt={4} justifyContent="center">
-          {!isEditing ? (
-            <Button variant="contained" onClick={() => setIsEditing(true)}>
-              Edit
+      {/* Action buttons */}
+      <Box mt={4} display="flex" gap={2}>
+        {!editMode ? (
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<EditIcon />}
+            onClick={() => setEditMode(true)}
+          >
+            Edit Profile
+          </Button>
+        ) : (
+          <>
+            <Button
+              variant="contained"
+              color="success"
+              startIcon={<SaveIcon />}
+              onClick={handleSave}
+            >
+              Save Changes
             </Button>
-          ) : (
-            <>
-              <Button variant="contained" color="primary" onClick={handleSave}>
-                Save
-              </Button>
-              <Button variant="outlined" onClick={handleCancel}>
-                Cancel
-              </Button>
-            </>
-          )}
-        </Stack>
-      </Paper>
+            <Button
+              variant="outlined"
+              color="inherit"
+              startIcon={<CloseIcon />}
+              onClick={handleDiscard}
+            >
+              Discard
+            </Button>
+          </>
+        )}
+      </Box>
 
-      {/* Snackbar/Toast Notification */}
+      {/* Snackbar */}
       <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000} // automatically close after 3 seconds
-        onClose={() => setSnackbarOpen(false)}
+        open={snack.open}
+        autoHideDuration={3000}
+        onClose={() => setSnack({ ...snack, open:false })}
+        anchorOrigin={{ vertical:'top', horizontal:'center' }}
       >
-        <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)} sx={{ width: '100%' }}>
-          {snackbarMessage}
+        <Alert
+          severity={snack.sev}
+          sx={{ width:'100%' }}
+          onClose={() => setSnack({ ...snack, open:false })}
+        >
+          {snack.msg}
         </Alert>
       </Snackbar>
     </Container>
   );
 };
 
-export default UserProfile;
+export default ProfilePage;

@@ -1,283 +1,110 @@
 import React, { useState } from "react";
-import { Box, TextField, Button, Typography, Container, Snackbar, Alert } from "@mui/material";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import { useUserStore } from '../../store/useUserStore';
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Link,
+  Snackbar,
+  Alert,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../../store/useUserStore";
 
-const AuthForm = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipcode: "",
-  });
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const setUser = useUserStore((state) => state.setUser);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  // Snackbar state
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // success or error
+  const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
 
-  const navigate = useNavigate(); // useNavigate hook for programmatic navigation
-  const { user, setUser } = useUserStore();
+  const handleLogin = async () => {
+    try {
+      const res = await fetch("http://localhost:5001/user/login", {
+        method: "POST",
+        credentials: "include", // important: get token in cookie
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-  const toggleAuthMode = () => {
-    setIsSignUp((prev) => !prev);
-    setFormData({
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      phone: "",
-      address: "",
-      city: "",
-      state: "",
-      zipcode: "",
-    });
-  };
+      const data = await res.json();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (isSignUp) {
-      // Handle signup logic
-      if (formData.password !== formData.confirmPassword) {
-        setSnackbarMessage("Passwords do not match.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
-        return;
-      }
-      try {
-        const response = await fetch("http://127.0.0.1:5001/user/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+      if (res.ok && data.user) {
+        setUser({
+          name: data.user.name,
+          userId: data.user.id,
         });
-
-        const data = await response.json();
-
-        if (response.ok && data.token) {
-          localStorage.setItem("token", data.token);
-          setSnackbarMessage("Signup successful!");
-          setSnackbarSeverity("success");
-          setSnackbarOpen(true);
-          navigate("/dashboard"); // Use navigate for programmatic navigation
-        } else {
-          setSnackbarMessage(data.message || "Signup failed.");
-          setSnackbarSeverity("error");
-          setSnackbarOpen(true);
-        }
-      } catch (err) {
-        console.error("Signup error:", err);
-        setSnackbarMessage("Error during signup. Check console for details.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
+        navigate("/");
+      } else {
+        setError(data.message || "Invalid login credentials.");
+        setOpen(true);
       }
-    } else {
-      // Handle login logic
-      try {
-        const response = await fetch("http://127.0.0.1:5001/user/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.token) {
-          localStorage.setItem("token", data.token);
-          localStorage.setItem("user_id", data.user.id);
-          setUser(data.user);
-          setSnackbarMessage("Login successful!");
-          setSnackbarSeverity("success");
-          setSnackbarOpen(true);
-          setTimeout(() => {
-            navigate("/"); // Use navigate for programmatic navigation
-          }, 2000);
-        } else {
-          setSnackbarMessage(data.message || "Login failed.");
-          setSnackbarSeverity("error");
-          setSnackbarOpen(true);
-        }
-      } catch (err) {
-        console.error("Login error:", err);
-        setSnackbarMessage("Error during login. Check console for details.");
-        setSnackbarSeverity("error");
-        setSnackbarOpen(true);
-      }
+      
+    } catch (err) {
+      setError("Something went wrong. Please try again.");
+      setOpen(true);
     }
   };
 
   return (
-    <Container
-      component="main"
-      maxWidth="xs"
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        padding: 2,
-        minHeight: "100vh", // Ensures the container is at least 100% of viewport height
-        overflow: "auto", // Ensures scrolling when content overflows
-      }}
-    >
-      {/* Text Section */}
-      <Box sx={{ textAlign: "center", marginBottom: 3 }}>
-        <Typography variant="h4">{isSignUp ? "Join us here" : "Welcome!"}</Typography>
-        <Typography variant="body1">
-          {isSignUp ? "Create an account to get started!" : "Sign in to continue."}
+    <Container maxWidth="xs">
+      <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
+        <Typography variant="h4" mb={2} color="success.main" fontWeight={600}>
+          Welcome 👋
         </Typography>
-      </Box>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        {isSignUp && (
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Username"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-          />
-        )}
 
         <TextField
           fullWidth
-          margin="normal"
           label="Email"
-          name="email"
           type="email"
-          value={formData.email}
-          onChange={handleChange}
+          value={email}
+          margin="normal"
+          onChange={(e) => setEmail(e.target.value)}
         />
-
         <TextField
           fullWidth
-          margin="normal"
           label="Password"
-          name="password"
           type="password"
-          value={formData.password}
-          onChange={handleChange}
+          value={password}
+          margin="normal"
+          onChange={(e) => setPassword(e.target.value)}
         />
-
-        {isSignUp && (
-          <TextField
-            fullWidth
-            margin="normal"
-            label="Confirm Password"
-            name="confirmPassword"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-        )}
-
-        {isSignUp && (
-          <>
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Phone"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="City"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="State"
-              name="state"
-              value={formData.state}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              margin="normal"
-              label="Zipcode"
-              name="zipcode"
-              value={formData.zipcode}
-              onChange={handleChange}
-            />
-          </>
-        )}
 
         <Button
           fullWidth
           variant="contained"
-          sx={{
-            marginTop: 2,
-            backgroundColor: "#128934",
-            color: "white",
-            fontSize: "1.1rem",
-            padding: "0.6rem 0",
-          }}
-          type="submit"
+          color="success"
+          sx={{ mt: 2 }}
+          onClick={handleLogin}
         >
-          {isSignUp ? "Sign Up" : "Sign In"}
+          Login
         </Button>
 
-        <Box sx={{ textAlign: "center", marginTop: 2 }}>
-          <Typography variant="body2">
-            {isSignUp ? "Already have an account?" : "Don't have an account?"}
-            <b
-              onClick={toggleAuthMode}
-              style={{
-                cursor: "pointer",
-                color: "#128934",
-                fontWeight: "bold",
-              }}
-            >
-              {isSignUp ? " Sign in here" : " Sign up here"}
-            </b>
-          </Typography>
-        </Box>
-      </form>
+        <Typography variant="body2" mt={2}>
+          Don’t have an account?{" "}
+          <Link href="/signup" color="primary">
+            Sign up here
+          </Link>
+        </Typography>
+      </Box>
 
-      {/* Snackbar/Toast Notification */}
+      {/* Snackbar for errors */}
       <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000} // automatically close after 3 seconds
-        onClose={() => setSnackbarOpen(false)}
+        open={open}
+        autoHideDuration={4000}
+        onClose={() => setOpen(false)}
       >
-        <Alert severity={snackbarSeverity} onClose={() => setSnackbarOpen(false)} sx={{ width: '100%' }}>
-          {snackbarMessage}
+        <Alert severity="error" onClose={() => setOpen(false)} sx={{ width: "100%" }}>
+          {error}
         </Alert>
       </Snackbar>
     </Container>
   );
 };
 
-export default AuthForm;
+export default LoginPage;
