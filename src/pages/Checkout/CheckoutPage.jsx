@@ -110,7 +110,7 @@ const CheckoutPage = ({triggerSnackbar }) => {
                             color="success"
                             onClick={async () => {    
                                 try {
-                                    placeOrder(shippingAddress)
+                                    await placeOrder(shippingAddress)
                                     triggerSnackbar("Your order has been placed successfully!"); 
                                     navigate("/");
                                 }

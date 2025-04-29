@@ -66,14 +66,16 @@ const CartDrawer = ({ open, onClose }) => {
         ) : (
           <List>
             {cart.map((item) => (
+            <>
               <ListItem key={item.product_id} sx={{ padding: 0 }}>
                 <CartItem
                   item={item}
                   onRemoveItem={removeProductFromCart}
                   onUpdateQuantity={updateQuantity}
                 />
-              <Divider sx={{ width: '100%' }}/>
               </ListItem>
+              <Divider sx={{ width: '100%' }}/>
+            </>
             ))}
           </List>
         )}
