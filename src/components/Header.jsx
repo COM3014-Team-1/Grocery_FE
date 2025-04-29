@@ -8,28 +8,23 @@ import {
   IconButton,
   Box,
   Snackbar,
-  Alert
+  Alert,
+  Badge
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { useUserStore } from '../store/useUserStore';
+import CartDrawer from './CartDrawer';
+import { useCartStore } from '../store/useCartStore';
 
-const Header = ({ categories }) => {
+const Header = () => {
   const navigate = useNavigate();
   const { user, logout } = useUserStore();
-  const [anchorEl, setAnchorEl] = useState(null);
+  const { cart } = useCartStore();
   const [userMenuAnchorEl, setUserMenuAnchorEl] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-
-  const handleCategoryClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCategorySelect = (id) => {
-    navigate(`/category/${id}`);
-    setAnchorEl(null);
-  };
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleUserIconClick = (event) => {
     setUserMenuAnchorEl(event.currentTarget);
@@ -48,7 +43,7 @@ const Header = ({ categories }) => {
 
   return (
     <>
-      <AppBar position="sticky" sx={{ backgroundColor: 'success.main', color: 'black' }}>
+      <AppBar position="sticky" sx={{ backgroundColor: 'success.main', color: 'black' }} data-testid="header">
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           {/* Left Side: Logo + Home + Categories */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -63,15 +58,10 @@ const Header = ({ categories }) => {
 
           {/* Right Side: Cart + User/Login/Signup */}
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
-              {categories.map((cat) => (
-                <MenuItem key={cat.category_id} onClick={() => handleCategorySelect(cat.category_id)}>
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </Menu>
-            <IconButton onClick={() => navigate('/cart')}>
-              <ShoppingCartIcon sx={{ color: 'white' }} />
+            <IconButton onClick={() => setDrawerOpen(true)}>
+              <Badge badgeContent={cart.length > 0 ? cart.length : 0} color="error">
+                <ShoppingCartIcon sx={{ color: 'white' }} />
+              </Badge>
             </IconButton>
 
             {user ? (
@@ -110,6 +100,8 @@ const Header = ({ categories }) => {
           You have been logged out!
         </Alert>
       </Snackbar>
+
+      <CartDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </>
   );
 };

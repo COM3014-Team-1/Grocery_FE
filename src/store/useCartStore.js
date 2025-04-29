@@ -1,195 +1,149 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { useUserStore } from "./useUserStore";
+import { getAuthToken } from "../utils/auth"; // Adjust the import path as necessary
+import { orderResponseMapping } from "../utils/responseMapping";
 
-const INITIAL_STATE = {
-    cart: [],
-    totalItems: 0,
-    totalPrice: 0
-};
+const url = 'http://127.0.0.1:5001/order/cart';
 
-export const useCartStore = create(
-    persist(
-        (set, get) => ({
-            cart: INITIAL_STATE.cart,
-            totalItems: INITIAL_STATE.totalItems,
-            totalPrice: INITIAL_STATE.totalPrice,
-            addToCart: (product) => {
-                const cart = get().cart;
-                const cartItem = cart.find((item) => item.id === product.id);
+export const useCartStore = create((set, get) => ({
+  cart: [],
+  totalItems: 0,
+  totalPrice: 0,
 
-                if (cartItem) {
-                    const updatedCart = cart.map((item) =>
-                        item.id === product.id
-                            ? { ...item, quantity: item.quantity + 1 }
-                            : item
-                    );
-                    set((state) => ({
-                        cart: updatedCart,
-                        totalItems: state.totalItems + 1,
-                        totalPrice: state.totalPrice + product.price
-                    }));
-                } else {
-                    const updatedCart = [...cart, { ...product, quantity: 1 }];
+  fetchCart: async () => {
+    try {
+      const uid = useUserStore.getState().user.userId;
+      if (!uid) {
+        console.error("User ID is not available. Cannot fetch cart.");
+        return;
+      }
+      const token = getAuthToken();
+      const res = await fetch(`${url}/${uid}`, 
+      { 
+        method: "GET",
+        credentials: "include", 
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      const data = await res.json();
 
-                    set((state) => ({
-                        cart: updatedCart,
-                        totalItems: state.totalItems + 1,
-                        totalPrice: state.totalPrice + product.price
-                    }));
-                }
-            },
-            removeFromCart: (product) => {
-                const cart = get().cart;
-                const cartItem = cart.find((item) => item.id === product.id);
+      const totalItems = data.reduce((sum, item) => sum + item.quantity, 0);
+      const totalPrice = data.reduce((sum, item) => sum + item.quantity * item.price, 0);
 
-                if (cartItem && cartItem.quantity > 1) {
-                    const updatedCart = cart.map((item) =>
-                        item.id === product.id
-                            ? { ...item, quantity: item.quantity - 1 }
-                            : item
-                    );
-                    set((state) => ({
-                        cart: updatedCart,
-                        totalItems: state.totalItems - 1,
-                        totalPrice: state.totalPrice - product.price
-                    }));
-                } else {
-                    set((state) => ({
-                        cart: state.cart.filter((item) => item.id !== product.id),
-                        totalItems: state.totalItems - 1,
-                        totalPrice: state.totalPrice - product.price
-                    }));
-                }
-            },
-            removeProductFromCart: (product) => {
-                set((state) => ({
-                    cart: state.cart.filter((item) => item.id !== product.id),
-                    totalItems: state.totalItems - 1,
-                    totalPrice: state.totalPrice - product.price
-                }));
-            },
-            emptyCart: () => {
-                set(() => ({
-                    cart: [],
-                    totalItems: 0,
-                    totalPrice: 0
-                }));
-            }
-        }),
-        {
-            name: "cart-storage"
-        }
-    )
-);
+      set({ cart: data, totalItems, totalPrice });
+    } catch (err) {
+      set({ cart: [] });
+      set({ totalItems: 0 });
+      set({ totalPrice: 0 });
+      console.error("Failed to fetch cart:", err);
+    }
+  },
 
-// import { create } from "zustand";
-// import { persist } from "zustand/middleware";
+  addToCart: async (product) => {
+    try {
+      const token = getAuthToken();
+      const uid = useUserStore.getState().user.userId;
+      if (!uid) {
+        console.error("User ID is not available. Cannot add to cart.");
+        return;
+      }
+      await fetch(`${url}/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({ product_id: product.product_id, quantity: 1, user_id: uid, unit_price: product.price }),
+      });
 
-// import { Product } from "../types";
+      await get().fetchCart();
+    } catch (err) {
+      console.error("Failed to add to cart:", err);
+    }
+  },
 
-// interface State {
-//   cart: Product[];
-//   totalItems: number;
-//   totalPrice: number;
-// }
+  removeProductFromCart: async (productId) => {
+    try {
+      const token = getAuthToken();
+      const uid = useUserStore.getState().user.userId;
+      if (!uid) {
+        console.error("User ID is not available. Cannot remove from cart.");
+        return;
+      }
+      await fetch(`${url}/remove`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+        body: JSON.stringify({ products: [productId], user_id: uid }),
+      });
 
-// interface Actions {
-//   addToCart: (Item: Product) => void;
-//   removeFromCart: (Item: Product) => void;
-//   emptyCart: () => void;
-//   removeProductFromCart: (Item: Product) => void;
-//   // increaseCount: () => void;
-//   // decreaseCount: () => void;
-// }
+      await get().fetchCart();
+    } catch (err) {
+      console.error("Failed to remove product from cart:", err);
+    }
+  },
 
-// const INITIAL_STATE: State = {
-//   cart: [],
-//   totalItems: 0,
-//   totalPrice: 0
-// };
+  emptyCart: async () => { //call when  order is placed
+    try {
+      const token = getAuthToken();
+      await fetch("/api/cart", {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-// export const useCartStore = create(
-//   persist<State & Actions>(
-//     (set, get) => ({
-//       cart: INITIAL_STATE.cart,
-//       totalItems: INITIAL_STATE.totalItems,
-//       totalPrice: INITIAL_STATE.totalPrice,
-//       addToCart: (product: Product) => {
-//         const cart = get().cart;
-//         const cartItem = cart.find((item) => item.id === product.id);
+      set({ cart: [], totalItems: 0, totalPrice: 0 });
+    } catch (err) {
+      console.error("Failed to empty cart:", err);
+    }
+  },
 
-//         if (cartItem) {
-//           const updatedCart = cart.map((item) =>
-//             item.id === product.id
-//               ? { ...item, quantity: (item.quantity as number) + 1 }
-//               : item
-//           );
-//           set((state) => ({
-//             cart: updatedCart,
-//             totalItems: state.totalItems + 1,
-//             totalPrice: state.totalPrice + product.price
-//           }));
-//         } else {
-//           const updatedCart = [...cart, { ...product, quantity: 1 }];
+  updateQuantity: async (productId, quantity) => {
+    try {
+      const token = getAuthToken();
+      await fetch(`${url}/update/${productId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+        body: JSON.stringify({ quantity }),
+      });
 
-//           set((state) => ({
-//             cart: updatedCart,
-//             totalItems: state.totalItems + 1,
-//             totalPrice: state.totalPrice + product.price
-//           }));
-//         }
-//       },
-//       removeFromCart: (product: Product) => {
-//         const cart = get().cart;
-//         const cartItem = cart.find((item) => item.id === product.id);
-        
-//         if (cartItem && cartItem.quantity && cartItem.quantity > 1) {
-//           const updatedCart = cart.map((item) =>
-//             item.id === product.id
-//               ? { ...item, quantity: (item.quantity as number) - 1 }
-//               : item
-//           );
-//           set((state) => ({
-//             cart: updatedCart,
-//             totalItems: state.totalItems - 1,
-//             totalPrice: state.totalPrice - product.price
-//           }));
-//         } else {
-//           set((state) => ({
-//             cart: state.cart.filter((item) => item.id !== product.id),
-//             totalItems: state.totalItems - 1,
-//             totalPrice: state.totalPrice - product.price
-//           }));
-//         }
-//       },
-//       removeProductFromCart: (product: Product) => {
-//         set((state) => ({
-//           cart: state.cart.filter((item) => item.id !== product.id),
-//           totalItems: state.totalItems - 1,
-//           totalPrice: state.totalPrice - product.price
-//         }));
-//       },
-//       emptyCart: () => {
-//         set(() => ({
-//           cart: [],
-//           totalItems: 0,
-//           totalPrice: 0
-//         }));
-//       }
-//     }),
-//     {
-//       name: "cart-storage"
-//       // getStorage: () => sessionStorage, (optional) by default the 'localStorage' is used
-//       // version: 1, // State version number,
-//       // migrate: (persistedState: unknown, version: number) => {
-//       // 	if (version === 0) {
-//       // 		// if the stored value is in version 0, we rename the field to the new name
-//       // 		persistedState.totalProducts = persistedState.totalItems
-//       // 		delete persistedState.totalItems
-//       // 	}
+      await get().fetchCart();
+    } catch (err) {
+      console.error("Failed to increase quantity:", err);
+    }
+  },
+  
+  placeOrder: async (shippingAddress) => {
+    try {
+      const token = getAuthToken();
+      const orderData = orderResponseMapping(get().cart, shippingAddress);
 
-//       // 	return persistedState as State & Actions
-//       // },
-//     }
-//   )
-// );
+      await fetch("http://localhost:5001/order/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      await get().fetchCart();
+      // await get().emptyCart();
+    } catch (err) {
+      console.error("Failed to place order:", err);
+    }
+  },
+}));
+

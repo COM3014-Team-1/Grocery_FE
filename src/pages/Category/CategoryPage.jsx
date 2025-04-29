@@ -1,12 +1,11 @@
 import React from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Box, Typography, Card, Divider, CardContent, LinearProgress, Slider, Checkbox, FormControlLabel, FormGroup, FormLabel, Select, MenuItem, Button, Rating, Grid2, CircularProgress } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Card, Divider, Slider, Checkbox, FormControlLabel, FormGroup, FormLabel, Select, MenuItem, Button, Rating, Grid2, CircularProgress } from '@mui/material';
 import ProductCard from '../../components/ProductCard';
 import { TextField, InputAdornment } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import { getAuthToken } from '../../utils/auth';
 
 const FilterPanel = ({ filters, setFilters, clearFilters }) => {
   const handlePriceChange = (event, newValue) => {
@@ -132,7 +131,14 @@ const CategoryPage = ({ id }) => {
   useEffect(() => {
     setFetching(true);
     setProducts([]);
-    fetch(`http://localhost:5001/products/by-category/${id}`)
+    const token = getAuthToken();
+    fetch(`http://localhost:5001/products/by-category/${id}`, {
+      credentials: "include",
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    })
       .then(res => res.json())
       .then(data => {
         setProducts(data);

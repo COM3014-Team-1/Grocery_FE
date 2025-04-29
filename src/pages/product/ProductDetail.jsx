@@ -15,24 +15,34 @@ import {
 import { useCartStore } from "../../store/useCartStore";
 import RelatedProducts from "./RelatedProducts";
 import { formatCurrency } from "../../utils/currencyUtil";
+import { getAuthToken } from "../../utils/auth";
+import AlertNotification from "../../components/Alert";
 
 export default function ProductDetail() {
   const { id } = useParams();
-  const addToCart = useCartStore((state) => state.addToCart);
+  const { addToCart, cart, updateQuantity } = useCartStore();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [related, setRelated] = useState([]);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
     const url = `http://127.0.0.1:5001/products/${id}`;
     async function fetchData() {
       setLoading(true);
       try {
-        const response = await fetch(url);
+        const token = getAuthToken();
+        const response = await fetch(url, {
+          credentials: "include",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
         const result = await response.json();
         const transformed = {
-          product_id: result.produc_id,
+          product_id: result.product_id,
           name: result.name,
           price: result.price,
           description: result.description,
@@ -47,7 +57,13 @@ export default function ProductDetail() {
   
         setData(transformed);
   
-        const resp = await fetch(`http://127.0.0.1:5001/products/by-category/${transformed.category_id}`);
+        const resp = await fetch(`http://127.0.0.1:5001/products/by-category/${transformed.category_id}`, {
+          credentials: "include",
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
         const allProducts = await resp.json();
   
         const filtered = allProducts
@@ -123,10 +139,34 @@ export default function ProductDetail() {
             variant="contained"
             color="success"
             startIcon={<AddShoppingCartIcon />}
-            onClick={() => addToCart(data)}
+            // onClick={() => addToCart(data)}
             sx={{
               width: "20%",
             }}
+            onClick={async () => {
+              const token = getAuthToken();
+            
+              if (!token) {
+                setSnackbar({ open: true, message: 'Please login to add item to cart', severity: 'warning' });
+                return;
+              }
+            
+              try {
+                // Check if the item is already in the cart
+                const existingItem = cart.find((item) => item.product_id === data.product_id);
+                if(existingItem) {
+                  // If the item is already in the cart, increase its quantity
+                  await updateQuantity(data.product_id, existingItem.quantity + 1);
+                  setSnackbar({ open: true, message: 'Item added to cart successfully', severity: 'info' });
+                  return;
+                }
+                await addToCart(data);
+                setSnackbar({ open: true, message: 'Item added to cart successfully', severity: 'success' });
+              } catch (err) {
+                setSnackbar({ open: true, message: 'Failed to add item to cart', severity: 'error' });
+              }
+            }}
+            
           >
             Add to Cart
           </Button>
@@ -144,6 +184,9 @@ export default function ProductDetail() {
       </Card>
 
       <RelatedProducts relatedProducts={related} />
+
+      <AlertNotification setSnackbarOpen={() => { setSnackbar({ open: false })}} snackbarMessage={snackbar.message} snackbarOpen={snackbar.open}/>
     </Container>
   );
 }
+
