@@ -23,7 +23,7 @@ const UserDetailsPage = ({ subtotal, setShippingAddress }) => {
     const fetchUserDetails = async () => {
       try {
         const token = getAuthToken();
-        const res = await fetch(`http://localhost:5001/user/user/${userId}`, {
+        const res = await fetch(`http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/user/user/${userId}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

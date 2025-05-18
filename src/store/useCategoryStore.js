@@ -7,7 +7,7 @@ const useCategoryStore = create((set) => ({
   fetchCategories: async () => {
     set({ isLoading: true });
     try {
-    const response = await fetch("http://127.0.0.1:5001/categories", {
+    const response = await fetch("http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/categories", {
       headers: {
         'Content-Type': 'application/json',
       }

@@ -28,7 +28,7 @@ export default function ProductDetail() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   useEffect(() => {
-    const url = `http://127.0.0.1:5001/products/${id}`;
+    const url = `http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/products/${id}`;
     async function fetchData() {
       setLoading(true);
       try {
@@ -57,7 +57,7 @@ export default function ProductDetail() {
   
         setData(transformed);
   
-        const resp = await fetch(`http://127.0.0.1:5001/products/by-category/${transformed.category_id}`, {
+        const resp = await fetch(`http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/products/by-category/${transformed.category_id}`, {
           credentials: "include",
           headers: {
             'Authorization': `Bearer ${token}`,

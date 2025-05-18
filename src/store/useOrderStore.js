@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { useUserStore } from "./useUserStore";
 import { getAuthToken } from "../utils/auth";
 
-const url = 'http://127.0.0.1:5001/order/user';
+const url = 'http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/order/user';
 
 export const useOrderStore = create((set) => ({
   orders: [],

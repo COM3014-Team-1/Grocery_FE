@@ -23,7 +23,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch("http://localhost:5001/user/login", {
+      const res = await fetch("http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/user/login", {
         method: "POST",
         credentials: "include", // important: get token in cookie
         headers: {
@@ -35,6 +35,11 @@ const LoginPage = () => {
       const data = await res.json();
 
       if (res.ok && data.user) {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        } else {
+          console.error("Token not received in response.");
+        }
         setUser({
           name: data.user.name,
           userId: data.user.id,

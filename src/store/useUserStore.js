@@ -10,7 +10,7 @@ export const useUserStore = create(
       logout: async () => {
         try {
           // Call BFF logout to clear token cookie
-          await fetch("http://localhost:5001/user/logout", {
+          await fetch("http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/user/logout", {
             method: "POST",
             credentials: "include",
           });
@@ -20,6 +20,7 @@ export const useUserStore = create(
 
           // Clear persisted user from localStorage
           localStorage.removeItem('user-storage');
+          localStorage.removeItem('token');
         } catch (error) {
           console.error("Logout failed:", error);
         }

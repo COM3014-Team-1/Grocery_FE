@@ -40,7 +40,7 @@ const SignupPage = () => {
 
   const handleSignup = async () => {
     try {
-      const res = await fetch('http://localhost:5001/user/signup', {
+      const res = await fetch('http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/user/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

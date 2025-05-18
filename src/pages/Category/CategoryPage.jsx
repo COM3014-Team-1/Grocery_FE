@@ -132,7 +132,7 @@ const CategoryPage = ({ id }) => {
     setFetching(true);
     setProducts([]);
     const token = getAuthToken();
-    fetch(`http://localhost:5001/products/by-category/${id}`, {
+    fetch(`http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/products/by-category/${id}`, {
       credentials: "include",
       headers: {
         'Authorization': `Bearer ${token}`,

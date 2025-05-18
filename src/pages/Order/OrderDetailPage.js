@@ -18,7 +18,7 @@ const OrderDetailPage = () => {
   useEffect(() => {
     const fetchOrderDetail = async () => {
       try {
-        const res = await fetch(`http://localhost:5001/order/${orderId}`, {
+        const res = await fetch(`http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/order/${orderId}`, {
           credentials: 'include',
           headers: {
             Authorization: `Bearer ${token}`,

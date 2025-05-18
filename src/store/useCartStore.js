@@ -3,7 +3,7 @@ import { useUserStore } from "./useUserStore";
 import { getAuthToken } from "../utils/auth"; // Adjust the import path as necessary
 import { orderResponseMapping } from "../utils/responseMapping";
 
-const url = 'http://127.0.0.1:5001/order/cart';
+const url = 'http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/order/cart';
 
 export const useCartStore = create((set, get) => ({
   cart: [],
@@ -130,7 +130,7 @@ export const useCartStore = create((set, get) => ({
       const token = getAuthToken();
       const orderData = orderResponseMapping(get().cart, shippingAddress);
 
-      await fetch("http://localhost:5001/order/create", {
+      await fetch("http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/order/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -22,7 +22,7 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user?.userId) return;
-      const res = await fetch(`http://localhost:5001/user/user/${user.userId}`, {
+      const res = await fetch(`http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/user/user/${user.userId}`, {
         headers:{ Authorization:`Bearer ${getAuthToken()}` },
         credentials:'include'
       });
@@ -42,7 +42,7 @@ const ProfilePage = () => {
         const { created_at,user_id, ...payload } = form;   // created_at
 
         const res = await fetch(
-            `http://localhost:5001/user/user/${user.userId}/edit`,
+            `http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/user/user/${user.userId}/edit`,
             {
               method: 'PUT',
               headers: {
