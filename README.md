@@ -2,7 +2,8 @@
 
 # Demo Video
 
-<video src="demo/Grocify_demo.mp4" width="600" controls muted></video>
+
+[▶️ Click to view demo video](https://github.com/COM3014-Team-1/Grocery_FE/blob/main/demo/Grocify_demo.mp4)
 
 # Folder Structure
 src/
