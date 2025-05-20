@@ -12,27 +12,7 @@ const RelatedProducts = ({ relatedProducts }) => {
             {relatedProducts.map((prod, index) => (
                 <Grid2 item xs={12} sm={6} md={4} key={index}>
                     <ProductCard product={prod} />
-                    {/* <Card key={index} sx={{ display: "flex", marginBottom: 2, flexDirection: "column", height: "100%" }}>
-                        <Box
-                            component="img"
-                            src="/broccoli_opt.jpg"
-                            alt={prod}
-                            sx={{
-                                width: 200,
-                                objectFit: "cover",
-                                height: "100%",
-                                borderRadius: 4,
-                            }}
-                            />
-                        <CardContent sx={{ flex: 1 }}>
-                            <Typography variant="h6">{prod}</Typography>
-                            <Button variant="contained" color="primary">
-                            View Details
-                            </Button>
-                        </CardContent>
-                    </Card> */}
                 </Grid2>
-            //   <ProductCard key={index} product={prod} />
             ))}
         </Grid2>
       </Box>

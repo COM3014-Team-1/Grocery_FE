@@ -1,13 +1,13 @@
 import React, {useState } from 'react';
-import { Box, Typography, Card, Divider, CardActionArea, CardMedia, CardContent, Container } from '@mui/material';
+import { Box, Typography, Card, Divider, CardActionArea, CardMedia, CardContent, Container, Skeleton } from '@mui/material';
 import CategoryPage from '../Category/CategoryPage';
+import CategoryImage from '../../components/CategoryImage';
 
 
 const Home = ({ categories }) => {
 
   // if(categories.length > 0) {
-    const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0].category_id);
-  
+    const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0].category_id);  
 
   return (
     <Box>
@@ -45,29 +45,12 @@ const Home = ({ categories }) => {
           pb={2}
         >
           {categories.map((category) => (
-            <Card
+            <CategoryImage 
               key={category.category_id}
-              sx={{
-                minWidth: 120,
-                minHeight: 120,
-                borderRadius: 2,
-                border: selectedCategoryId === category.category_id ? '2px solid green' : '1px solid #ccc',
-                flexShrink: 0,
-              }}
-            >
-              <CardActionArea onClick={() => setSelectedCategoryId(category.category_id)}>
-                <CardMedia
-                  component="img"
-                  height="80"
-                  image='/broccoli_opt.jpg'
-                  alt={category.name}
-                  sx={{ objectFit: 'contain', borderRadius: 1, backgroundColor: '#f5f5f5', }}
-                />
-                <CardContent sx={{ textAlign: 'center', p: 1 }}>
-                  <Typography variant="subtitle2">{category.name}</Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
+              category={category}
+              onClick={() => setSelectedCategoryId(category.category_id)}
+              selectedCategoryId={selectedCategoryId}
+            />
           ))}
         </Box>
 
