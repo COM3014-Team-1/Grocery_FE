@@ -133,7 +133,7 @@ const OrderDetailPage = () => {
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography>Shipping Fee</Typography>
-                  <Typography>£1.00</Typography>
+                  <Typography>£3.00</Typography>
                 </Box>
                 <Box display="flex" justifyContent="space-between">
                   <Typography>Discount</Typography>
@@ -143,7 +143,7 @@ const OrderDetailPage = () => {
                 <Box display="flex" justifyContent="space-between">
                   <Typography variant="h6" fontWeight="bold">Total</Typography>
                   <Typography variant="h6" fontWeight="bold">
-                    £{(order.total_amount + 1).toFixed(2)}
+                    £{(order.total_amount + 3).toFixed(2)}
                   </Typography>
                 </Box>
               </>
