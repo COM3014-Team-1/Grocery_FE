@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Chip } from '@mui/material';
 import {
   Box,
   Button,
@@ -8,14 +9,26 @@ import {
   Snackbar,
   Alert,
   Link,
-  Stack
+  Stack,
+  Grid
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import LocalMallIcon from '@mui/icons-material/LocalMall';
 import LoginIcon from '@mui/icons-material/Login';
 import CelebrationIcon from '@mui/icons-material/Celebration';
-import { Grid } from '@mui/material';
+
+const isValidPassword = (password) => {
+  const lengthOK = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasLower = /[a-z]/.test(password);
+  const hasDigit = /\d/.test(password);
+  const hasSpecial = /[^\w\s]/.test(password);
+  return {
+    valid: lengthOK && hasUpper && hasLower && hasDigit && hasSpecial,
+    checks: { lengthOK, hasUpper, hasLower, hasDigit, hasSpecial }
+  };
+};
 
 const SignupPage = () => {
   const navigate = useNavigate();
@@ -30,15 +43,27 @@ const SignupPage = () => {
     zipcode: ''
   });
 
+  const [passwordCheck, setPasswordCheck] = useState({ valid: false, checks: {} });
   const [error, setError] = useState('');
   const [successOpen, setSuccessOpen] = useState(false);
   const [errorOpen, setErrorOpen] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === 'password') {
+      setPasswordCheck(isValidPassword(value));
+    }
   };
 
   const handleSignup = async () => {
+    if (!passwordCheck.valid) {
+      setError("Password does not meet required format.");
+      setErrorOpen(true);
+      return;
+    }
+
     try {
       const res = await fetch('http://grocerybff-env.eba-vmrzu4fu.eu-west-2.elasticbeanstalk.com/user/signup', {
         method: 'POST',
@@ -60,6 +85,8 @@ const SignupPage = () => {
       setErrorOpen(true);
     }
   };
+
+  const { checks } = passwordCheck;
 
   return (
     <Container maxWidth="sm">
@@ -84,25 +111,33 @@ const SignupPage = () => {
         </Box>
 
         <Box component="form" noValidate autoComplete="off" display="flex" flexDirection="column" gap={2}>
-            <TextField name="name" label="Full Name" required fullWidth onChange={handleChange} />
-            <TextField name="email" label="Email" type="email" required fullWidth onChange={handleChange} />
-            <TextField name="password" label="Password" type="password" required fullWidth onChange={handleChange} />
-            <TextField name="phone" label="Phone Number" required fullWidth onChange={handleChange} />
+          <TextField name="name" label="Full Name" required fullWidth onChange={handleChange} />
+          <TextField name="email" label="Email" type="email" required fullWidth onChange={handleChange} />
+          <TextField name="password" label="Password" type="password" required fullWidth onChange={handleChange} />
 
-            <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                    <TextField name="address" label="Street Address" required fullWidth onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField name="city" label="City" required fullWidth onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField name="state" label="State" required fullWidth onChange={handleChange} />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                    <TextField name="zipcode" label="Zip Code" required fullWidth onChange={handleChange} />
-                </Grid>
+          <Box display="flex" flexWrap="wrap" gap={1} mt={1}>
+            <Chip label="8+ chars" color={checks.lengthOK ? 'success' : 'error'} size="small" />
+            <Chip label="Uppercase" color={checks.hasUpper ? 'success' : 'error'} size="small" />
+            <Chip label="Lowercase" color={checks.hasLower ? 'success' : 'error'} size="small" />
+            <Chip label="Number" color={checks.hasDigit ? 'success' : 'error'} size="small" />
+            <Chip label="Special" color={checks.hasSpecial ? 'success' : 'error'} size="small" />
+          </Box>
+
+          <TextField name="phone" label="Phone Number" required fullWidth onChange={handleChange} />
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField name="address" label="Street Address" required fullWidth onChange={handleChange} />
             </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField name="city" label="City" required fullWidth onChange={handleChange} />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField name="state" label="State" required fullWidth onChange={handleChange} />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField name="zipcode" label="Zip Code" required fullWidth onChange={handleChange} />
+            </Grid>
+          </Grid>
         </Box>
 
         <Button
@@ -111,7 +146,10 @@ const SignupPage = () => {
           size="large"
           onClick={handleSignup}
           startIcon={<CelebrationIcon />}
-          disabled={!form.name || !form.email || !form.password || !form.phone || !form.address || !form.city || !form.state || !form.zipcode}
+          disabled={
+            !form.name || !form.email || !form.password || !form.phone ||
+            !form.address || !form.city || !form.state || !form.zipcode || !passwordCheck.valid
+          }
         >
           Join Now
         </Button>
