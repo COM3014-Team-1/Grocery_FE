@@ -1,5 +1,9 @@
 # Grocery FE
 
+# Demo Video
+
+<video src="demo/Grocify_demo.mp4" width="600" controls muted></video>
+
 # Folder Structure
 src/
 │   ├── components/   # Reusable UI components
